@@ -32,7 +32,7 @@ require_relative '../lib/xcop'
 # License:: MIT
 class TestXcop < Minitest::Test
   def test_basic
-    Dir.mktmpdir 'test' do |dir|
+    Dir.mktmpdir 'test1' do |dir|
       f = File.join(dir, 'a.xml')
       File.write(f, "<?xml version=\"1.0\"?>\n<hello>Dude!</hello>\n")
       assert_equal(Xcop::Document.new(f).diff, '')
@@ -40,7 +40,7 @@ class TestXcop < Minitest::Test
   end
 
   def test_license_presence
-    Dir.mktmpdir 'test' do |dir|
+    Dir.mktmpdir 'test2' do |dir|
       f = File.join(dir, 'a.xml')
       license = "Copyright (c) All Good People\nDon't touch it!\n\n"
       File.write(
@@ -48,9 +48,9 @@ class TestXcop < Minitest::Test
         [
           '<?xml version="1.0"?>',
           '<!--',
-          ' * Copyright (c) All Good People',
-          ' * Don\'t touch it!',
-          ' -->',
+          'Copyright (c) All Good People',
+          'Don\'t touch it!',
+          '-->',
           '<hello>Dude!</hello>',
           ''
         ].join("\n")

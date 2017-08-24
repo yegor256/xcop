@@ -48,7 +48,7 @@ end
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
 
-license = opts.license? ? File.read(opts.license) : ''
+license = opts.license? ? File.read(opts[:license]) : ''
 
 opts.arguments.each do |f|
   print "Validating #{f}... "
@@ -61,9 +61,11 @@ opts.arguments.each do |f|
   end
   unless license.empty?
     ldiff = doc.ldiff(license)
-    print "Broken license\n"
-    puts ldiff
-    exit -1
+    unless ldiff.empty?
+      print "Broken license\n"
+      puts ldiff
+      exit -1
+    end
   end
   print "OK\n"
 end

@@ -52,12 +52,8 @@ module Xcop
       now = xml.xpath('/comment()')[0].to_s
       ideal = [
         '<!--',
-        *license.strip
-          .split(/\n/)
-          .map { |t| " #{t}" }
-          .map(&:rstrip)
-          .map { |t| " *#{t}" },
-        ' -->'
+        *license.strip.split(/\n/).map(&:strip),
+        '-->'
       ].join("\n")
       return Differ.diff_by_line(ideal, now).to_s unless now == ideal
       ''
