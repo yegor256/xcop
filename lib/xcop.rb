@@ -55,6 +55,15 @@ module Xcop
         print "OK\n"
       end
     end
+
+    # Fix them all.
+    def fix
+      @files.each do |f|
+        print "Fixing #{f}... "
+        Document.new(f).fix(@license)
+        print "done\n"
+      end
+    end
   end
 
   # One document.
@@ -78,15 +87,23 @@ module Xcop
     # Return the difference for the license.
     def ldiff(license)
       xml = Nokogiri::XML(File.open(@path), &:noblanks)
-      now = xml.xpath('/comment()')[0].to_s
-      ideal = [
-        '<!--',
-        *license.strip.split(/\n/).map(&:strip),
-        '-->'
-      ].join("\n")
+      now = xml.xpath('/comment()')[0].text.to_s.strip
+      ideal = license.strip
       Differ.format = :color
       return Differ.diff_by_line(ideal, now).to_s unless now == ideal
       ''
+    end
+
+    # Fixes the document.
+    def fix(license = '')
+      xml = Nokogiri::XML(File.open(@path), &:noblanks)
+      unless license.empty?
+        xml.children.before(
+          Nokogiri::XML::Comment.new(xml, license.strip)
+        )
+      end
+      ideal = xml.to_xml(indent: 2)
+      File.write(@path, ideal)
     end
   end
 end

@@ -32,6 +32,7 @@ opts = Slop.parse(ARGV, strict: true, help: true) do |o|
   o.banner = "Usage (#{Xcop::VERSION}): xcop [options] [files...]"
   o.bool '-h', '--help', 'Show these instructions'
   o.bool '--version', 'Show current version'
+  o.bool '--fix', 'Fix all files instead of reporting their problems'
   o.string '--license', 'File name of the boilerplate head license'
 end
 
@@ -50,9 +51,13 @@ Encoding.default_internal = Encoding::UTF_8
 
 license = opts.license? ? File.read(opts[:license]) : ''
 
-begin
-  Xcop::CLI.new(opts.arguments, license).run
-rescue StandardError => e
-  puts e.message
-  exit -1
+if opts.fix?
+  Xcop::CLI.new(opts.arguments, license).fix
+else
+  begin
+    Xcop::CLI.new(opts.arguments, license).run
+  rescue StandardError => e
+    puts e.message
+    exit -1
+  end
 end

@@ -71,3 +71,14 @@ Feature: Command Line Processing
     And Stdout contains "Broken license"
     And Exit code is not zero
 
+  Scenario: Fixing incorrect XML file
+    Given I have a "broken.xml" file with content:
+    """
+    <a><b>something</b>
+    </a>
+    """
+    When I run bin/xcop with "--fix broken.xml"
+    Then Exit code is zero
+    Then I run bin/xcop with "broken.xml"
+    Then Exit code is zero
+
