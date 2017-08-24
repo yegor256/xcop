@@ -32,6 +32,7 @@ opts = Slop.parse(ARGV, strict: true, help: true) do |o|
   o.banner = "Usage (#{Xcop::VERSION}): xcop [options] [files...]"
   o.bool '-h', '--help', 'Show these instructions'
   o.bool '--version', 'Show current version'
+  o.string '--license', 'File name of the boilerplate head license'
 end
 
 if opts.help?
@@ -46,13 +47,22 @@ end
 
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
+
+license = opts.license? ? File.read(opts.license) : ''
+
 opts.arguments.each do |f|
   print "Validating #{f}... "
-  diff = Xcop::Document.new(f).diff
+  doc = Xcop::Document.new(f)
+  diff = doc.diff
   unless diff.empty?
     print "Error\n"
     puts diff
-    puts "XML formatting is broken in #{f}"
+    exit -1
+  end
+  unless license.empty?
+    ldiff = doc.ldiff(license)
+    print "Broken license\n"
+    puts ldiff
     exit -1
   end
   print "OK\n"

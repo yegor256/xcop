@@ -38,4 +38,24 @@ class TestXcop < Minitest::Test
       assert_equal(Xcop::Document.new(f).diff, '')
     end
   end
+
+  def test_license_presence
+    Dir.mktmpdir 'test' do |dir|
+      f = File.join(dir, 'a.xml')
+      license = "Copyright (c) All Good People\nDon't touch it!\n\n"
+      File.write(
+        f,
+        [
+          '<?xml version="1.0"?>',
+          '<!--',
+          ' * Copyright (c) All Good People',
+          ' * Don\'t touch it!',
+          ' -->',
+          '<hello>Dude!</hello>',
+          ''
+        ].join("\n")
+      )
+      assert_equal(Xcop::Document.new(f).ldiff(license), '')
+    end
+  end
 end

@@ -3,3 +3,8 @@ AllCops:
     - 'bin/**/*'
     - 'assets/**/*'
   DisplayCopNames: true
+
+Metrics/MethodLength:
+  Enabled: false
+Style/MultilineMethodCallIndentation:
+  Enabled: false

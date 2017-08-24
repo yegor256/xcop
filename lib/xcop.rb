@@ -43,11 +43,23 @@ module Xcop
       ideal = xml.to_xml(indent: 2)
       now = File.read(@path)
       return Differ.diff_by_line(ideal, now).to_s unless now == ideal
-      # unless now.start_with?(license)
-      #   print "License error\n"
-      #   puts Differ.diff_by_line(license, now).to_s
-      #   raise "License in the header is broken in #{f}"
-      # end
+      ''
+    end
+
+    # Return the difference for the license.
+    def ldiff(license)
+      xml = Nokogiri::XML(File.open(@path), &:noblanks)
+      now = xml.xpath('/comment()')[0].to_s
+      ideal = [
+        '<!--',
+        *license.strip
+          .split(/\n/)
+          .map { |t| " #{t}" }
+          .map(&:rstrip)
+          .map { |t| " *#{t}" },
+        ' -->'
+      ].join("\n")
+      return Differ.diff_by_line(ideal, now).to_s unless now == ideal
       ''
     end
   end
