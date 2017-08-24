@@ -13,7 +13,7 @@ Feature: Gem Package
       fail 'no executables: ' + File.read('./spec.rb')
     end
     """
-    When I run bash with
+    When I run bash with:
     """
     cd xcop
     gem build xcop.gemspec

@@ -73,7 +73,13 @@ Then(/^Exit code is not zero$/) do
   raise 'Zero exit code' if @exitstatus == 0
 end
 
-When(/^I run bash with$/) do |text|
+When(/^I run bash with "([^"]*)"$/) do |text|
+  FileUtils.copy_entry(@cwd, File.join(@dir, 'xcop'))
+  @stdout = `#{text}`
+  @exitstatus = $CHILD_STATUS.exitstatus
+end
+
+When(/^I run bash with:$/) do |text|
   FileUtils.copy_entry(@cwd, File.join(@dir, 'xcop'))
   @stdout = `#{text}`
   @exitstatus = $CHILD_STATUS.exitstatus
