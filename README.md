@@ -10,7 +10,7 @@
 [![Code Climate](http://img.shields.io/codeclimate/github/yegor256/xcop.svg)](https://codeclimate.com/github/yegor256/xcop)
 [![Test Coverage](https://img.shields.io/codecov/c/github/yegor256/xcop.svg)](https://codecov.io/github/yegor256/xcop?branch=master)
 
-## What This is for?
+## What this is for?
 
 This command line tool validates your XML files for proper formatting.
 If they are not formatted correctly, it prints the difference and
@@ -18,7 +18,7 @@ returns with an error. You can use it two ways: 1) to fail your build
 if any X-like files (XML, XSD, XSL, XHTML) are not formatted correctly,
 and 2) to format them correctly.
 
-## How to Install?
+## How to install?
 
 Install it first:
 
@@ -26,7 +26,7 @@ Install it first:
 $ gem install xcop
 ```
 
-## How to Run?
+## How to run?
 
 Run it locally and read its output:
 
