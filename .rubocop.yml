@@ -1,0 +1,5 @@
+AllCops:
+  Exclude:
+    - 'bin/**/*'
+    - 'assets/**/*'
+  DisplayCopNames: true
