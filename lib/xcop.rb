@@ -70,6 +70,7 @@ module Xcop
       xml = Nokogiri::XML(File.open(@path), &:noblanks)
       ideal = xml.to_xml(indent: 2)
       now = File.read(@path)
+      Differ.format = :color
       return Differ.diff_by_line(ideal, now).to_s unless now == ideal
       ''
     end
@@ -83,6 +84,7 @@ module Xcop
         *license.strip.split(/\n/).map(&:strip),
         '-->'
       ].join("\n")
+      Differ.format = :color
       return Differ.diff_by_line(ideal, now).to_s unless now == ideal
       ''
     end
