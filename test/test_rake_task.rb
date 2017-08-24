@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 # encoding: utf-8
 #
 # Copyright (c) 2017 Yegor Bugayenko
@@ -21,38 +20,37 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-STDOUT.sync = true
+require 'minitest/autorun'
+require 'tmpdir'
+require 'rake'
+require_relative '../lib/xcop/rake_task'
 
-require 'slop'
-require 'nokogiri'
-require_relative '../lib/xcop'
-require_relative '../lib/xcop/version'
+# Xcop rake task.
+# Author:: Yegor Bugayenko (yegor256@gmail.com)
+# Copyright:: Copyright (c) 2017 Yegor Bugayenko
+# License:: MIT
+class TestRakeTask < Minitest::Test
+  def test_basic
+    Dir.mktmpdir 'test' do |dir|
+      Dir.chdir(dir)
+      File.write('a.xml', "<?xml version=\"1.0\"?>\n<x/>\n")
+      Xcop::RakeTask.new(:xcop1) do |task|
+        # task.license = 'LICENSE.txt'
+      end
+      Rake::Task['xcop1'].invoke
+    end
+  end
 
-opts = Slop.parse(ARGV, strict: true, help: true) do |o|
-  o.banner = "Usage (#{Xcop::VERSION}): xcop [options] [files...]"
-  o.bool '-h', '--help', 'Show these instructions'
-  o.bool '--version', 'Show current version'
-  o.string '--license', 'File name of the boilerplate head license'
-end
-
-if opts.help?
-  puts opts
-  exit
-end
-
-if opts.version?
-  puts Xcop::VERSION
-  exit
-end
-
-Encoding.default_external = Encoding::UTF_8
-Encoding.default_internal = Encoding::UTF_8
-
-license = opts.license? ? File.read(opts[:license]) : ''
-
-begin
-  Xcop::CLI.new(opts.arguments, license).run
-rescue StandardError => e
-  puts e.message
-  exit -1
+  def test_with_broken_xml
+    Dir.mktmpdir 'test' do |dir|
+      Dir.chdir(dir)
+      File.write('broken.xml', "<z><a><b></b></a>\n\n</z>")
+      Xcop::RakeTask.new(:xcop2) do |task|
+        task.excludes = ['test/**/*']
+      end
+      assert_raises SystemExit do
+        Rake::Task['xcop2'].invoke
+      end
+    end
+  end
 end

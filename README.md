@@ -34,6 +34,20 @@ Run it locally and read its output:
 $ xcop --help
 ```
 
+## How to use in Rakefile?
+
+This is what you need there:
+
+```ruby
+require 'xcop/rake_task'
+desc 'Run XCop on all XML/XSL files in all directories'
+Xcop::RakeTask.new(:xcop) do |task|
+  task.license = 'LICENSE.txt'
+  task.includes = ['**/*.xml', '**/*.xsl']
+  task.excludes = ['target/**/*']
+end
+```
+
 ## How to contribute?
 
 Just submit a pull request. Make sure `rake` passes.

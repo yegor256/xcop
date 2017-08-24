@@ -29,6 +29,34 @@ require_relative 'xcop/version'
 # Copyright:: Copyright (c) 2017 Yegor Bugayenko
 # License:: MIT
 module Xcop
+  # Command line interface.
+  class CLI
+    def initialize(files, license)
+      @files = files
+      @license = license
+    end
+
+    def run
+      @files.each do |f|
+        print "Validating #{f}... "
+        doc = Document.new(f)
+        diff = doc.diff
+        unless diff.empty?
+          puts diff
+          raise "Invalid XML formatting in #{f}"
+        end
+        unless @license.empty?
+          ldiff = doc.ldiff(@license)
+          unless ldiff.empty?
+            puts ldiff
+            raise "Broken license in #{f}"
+          end
+        end
+        print "OK\n"
+      end
+    end
+  end
+
   # One document.
   class Document
     # Ctor.
