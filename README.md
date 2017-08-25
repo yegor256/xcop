@@ -51,7 +51,7 @@ $ xcop --fix broken-file.xml
 To fix all files in the directory you can do:
 
 ```bash
-$ find . -name '*.xml' -exec xcop --fix \{} \;
+$ xcop $(find . -name '*.xml')
 ```
 
 ## How to use in Rakefile?
