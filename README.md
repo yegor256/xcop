@@ -34,6 +34,13 @@ Run it locally and read its output:
 $ xcop --help
 ```
 
+To validate formatting of your XML files just pass their names
+as arguments:
+
+```bash
+$ xcop file1.xml file2.xml
+```
+
 If your files are not formatted correctly and `xcop` complains, you
 can ask it to fix them for you, using `--fix` option:
 
