@@ -69,4 +69,15 @@ class TestXcop < Minitest::Test
       assert_equal(Xcop::Document.new(f).ldiff(license), '')
     end
   end
+
+  def test_removes_previous_license
+    Dir.mktmpdir 'test4' do |dir|
+      f = File.join(dir, 'bad.xml')
+      license = "the license to add\n\n\nhey"
+      File.write(f, '<hello>how do you do?</hello>')
+      Xcop::Document.new(f).fix(license)
+      Xcop::Document.new(f).fix(license)
+      assert_equal(Nokogiri::XML(File.read(f)).xpath('/comment()').length, 1)
+    end
+  end
 end

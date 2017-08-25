@@ -98,6 +98,7 @@ module Xcop
     def fix(license = '')
       xml = Nokogiri::XML(File.open(@path), &:noblanks)
       unless license.empty?
+        xml.xpath('/comment()').remove
         xml.children.before(
           Nokogiri::XML::Comment.new(xml, "\n#{license.strip}\n")
         )
