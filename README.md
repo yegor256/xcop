@@ -42,7 +42,7 @@ $ xcop file1.xml file2.xml
 ```
 
 If your files are not formatted correctly and `xcop` complains, you
-can ask it to "beautify" them for you, using `--fix` option:
+can ask it to "beautify" them, using `--fix` option:
 
 ```bash
 $ xcop --fix broken-file.xml
