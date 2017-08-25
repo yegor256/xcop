@@ -34,6 +34,13 @@ Run it locally and read its output:
 $ xcop --help
 ```
 
+If your files are not formatted correctly and `xcop` complains, you
+can ask it to fix them for you, using `--fix` option:
+
+```bash
+$ xcop --fix broken-file.xml
+```
+
 ## How to use in Rakefile?
 
 This is what you need there:
