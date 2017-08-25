@@ -48,6 +48,46 @@ Xcop::RakeTask.new(:xcop) do |task|
 end
 ```
 
+## How to use in Maven `pom.xml`?
+
+You can integrate it with the help of ant-maven-plugin:
+
+```xml
+<project>
+  [...]
+  <build>
+    [...]
+    <plugins>
+      [...]
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <configuration>
+              <target>
+                <apply executable="xcop" failonerror="true">
+                  <fileset dir=".">
+                    <include name="**/*.xml"/>
+                    <include name="**/*.xsd"/>
+                    <exclude name="target/**/*"/>
+                    <exclude name=".idea/**/*"/>
+                  </fileset>
+                </apply>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+```
+
 ## How to contribute?
 
 Just submit a pull request. Make sure `rake` passes.
