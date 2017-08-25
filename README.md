@@ -54,7 +54,7 @@ To fix all files in the directory you can do:
 $ xcop $(find . -name '*.xml')
 ```
 
-## How to use in Rakefile?
+## How to use in `Rakefile`?
 
 This is what you need there:
 
