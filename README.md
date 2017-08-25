@@ -50,7 +50,8 @@ end
 
 ## How to use in Maven `pom.xml`?
 
-You can integrate it with the help of ant-maven-plugin:
+You can integrate it with the help of
+[ant-maven-plugin](http://maven.apache.org/plugins/maven-antrun-plugin/):
 
 ```xml
 <project>
