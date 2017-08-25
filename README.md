@@ -48,6 +48,12 @@ can ask it to fix them for you, using `--fix` option:
 $ xcop --fix broken-file.xml
 ```
 
+To fix all files in the directory you can do:
+
+```bash
+$ find . -name '*.xml' -exec xcop --fix \{} \;
+```
+
 ## How to use in Rakefile?
 
 This is what you need there:
