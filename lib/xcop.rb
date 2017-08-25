@@ -99,7 +99,7 @@ module Xcop
       xml = Nokogiri::XML(File.open(@path), &:noblanks)
       unless license.empty?
         xml.children.before(
-          Nokogiri::XML::Comment.new(xml, license.strip)
+          Nokogiri::XML::Comment.new(xml, "\n#{license.strip}\n")
         )
       end
       ideal = xml.to_xml(indent: 2)
