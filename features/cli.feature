@@ -19,9 +19,8 @@ Feature: Command Line Processing
 
     """
     When I run bin/xcop with "test.xml"
-    Then Stdout contains "OK"
+    Then Stdout contains "pretty"
     And Exit code is zero
-    And Stdout contains "Validating test.xml..."
 
   Scenario: Validating correct XML file with license
     Given I have a "licensed.xml" file with content:
@@ -40,9 +39,8 @@ Feature: Command Line Processing
     which is very very strict!
     """
     When I run bin/xcop with "--license LICENSE licensed.xml"
-    Then Stdout contains "OK"
+    Then Stdout contains "pretty"
     And Exit code is zero
-    And Stdout contains "Validating licensed.xml..."
 
   Scenario: Validating incorrect XML file
     Given I have a "abc.xml" file with content:

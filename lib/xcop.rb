@@ -22,6 +22,7 @@
 
 require 'nokogiri'
 require 'differ'
+require 'rainbow'
 require_relative 'xcop/version'
 
 # Xcop main module.
@@ -37,8 +38,9 @@ module Xcop
     end
 
     def run
+      puts 'Running xcop...'
+      puts "Inspecting #{pluralize(@files.length, 'file')}..."
       @files.each do |f|
-        print "Validating #{f}... "
         doc = Document.new(f)
         diff = doc.diff
         unless diff.empty?
@@ -52,8 +54,11 @@ module Xcop
             raise "Broken license in #{f}"
           end
         end
-        print "OK\n"
+        print Rainbow('.').green
       end
+      print "\n"
+      puts "#{pluralize(@files.length, 'file')} checked, \
+everything looks #{Rainbow('pretty').green}"
     end
 
     # Fix them all.
@@ -63,6 +68,12 @@ module Xcop
         Document.new(f).fix(@license)
         print "done\n"
       end
+    end
+
+    private
+
+    def pluralize(num, text)
+      "#{num} #{num == 1 ? text : text + 's'}"
     end
   end
 
