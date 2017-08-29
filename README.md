@@ -115,6 +115,7 @@ Something like this should work:
 
 ```xml
 <project>
+  [...]
   <target name="xcop">
     <apply executable="xcop" failonerror="true">
       <fileset dir=".">
