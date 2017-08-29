@@ -109,6 +109,25 @@ You can integrate it with the help of
 </project>
 ```
 
+## How to use in Ant `project.xml`?
+
+Something like this should work:
+
+```xml
+<project>
+  <target name="xcop">
+    <apply executable="xcop" failonerror="true">
+      <fileset dir=".">
+        <include name="**/*.xml"/>
+        <include name="**/*.xsd"/>
+        <exclude name="target/**/*"/>
+        <exclude name=".idea/**/*"/>
+      </fileset>
+    </apply>
+  </target>
+</project>
+```
+
 ## How to contribute?
 
 Just submit a pull request. Make sure `rake` passes.
