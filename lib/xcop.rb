@@ -86,7 +86,8 @@ module Xcop
     # Return the difference for the license.
     def ldiff(license)
       xml = Nokogiri::XML(File.open(@path), &:noblanks)
-      now = xml.xpath('/comment()')[0].text.to_s.strip
+      comment = xml.xpath('/comment()')[0]
+      now = comment.nil? ? '' : comment.text.to_s.strip
       ideal = license.strip
       Differ.format = :color
       return Differ.diff_by_line(ideal, now).to_s unless now == ideal

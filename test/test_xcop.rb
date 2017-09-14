@@ -59,6 +59,22 @@ class TestXcop < Minitest::Test
     end
   end
 
+  def test_license_absence
+    Dir.mktmpdir 'test3' do |dir|
+      f = File.join(dir, 'a.xml')
+      license = "Copyright (c) All Good People\nTouch me!\n\n"
+      File.write(
+        f,
+        [
+          '<?xml version="1.0"?>',
+          '<hello>My dear friend!</hello>',
+          ''
+        ].join("\n")
+      )
+      assert(Xcop::Document.new(f).ldiff(license) != '')
+    end
+  end
+
   def test_fixes_document
     Dir.mktmpdir 'test3' do |dir|
       f = File.join(dir, 'bad.xml')
