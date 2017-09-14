@@ -36,12 +36,14 @@ module Xcop
     attr_accessor :excludes
     attr_accessor :includes
     attr_accessor :license
+    attr_accessor :quiet
 
     def initialize(*args, &task_block)
       @name = args.shift || :xcop
       @includes = %w(xml xsd xhtml xsl html).map { |e| "**/*.#{e}" }
       @excludes = []
       @license = nil
+      @quiet = false
       desc 'Run Xcop' unless ::Rake.application.last_description
       task(name, *args) do |_, task_args|
         RakeFileUtils.send(:verbose, true) do
@@ -55,13 +57,23 @@ module Xcop
 
     def run
       require 'xcop'
+      puts 'Running xcop...' unless @quiet
       bad = Dir.glob(@excludes)
       good = Dir.glob(@includes).reject { |f| bad.include?(f) }
+      puts "Inspecting #{pluralize(good.length, 'file')}..." unless @quiet
       begin
-        Xcop::CLI.new(good, @license.nil? ? '' : File.read(@license)).run
+        Xcop::CLI.new(good, @license.nil? ? '' : File.read(@license)).run do
+          print Rainbow('.').green unless @quiet
+        end
       rescue StandardError => e
         abort(e.message)
       end
+      puts "\n#{pluralize(good.length, 'file')} checked, \
+everything looks #{Rainbow('pretty').green}" unless @quiet
+    end
+
+    def pluralize(num, text)
+      "#{num} #{num == 1 ? text : text + 's'}"
     end
   end
 end

@@ -38,8 +38,6 @@ module Xcop
     end
 
     def run
-      puts 'Running xcop...'
-      puts "Inspecting #{pluralize(@files.length, 'file')}..."
       @files.each do |f|
         doc = Document.new(f)
         diff = doc.diff
@@ -54,26 +52,16 @@ module Xcop
             raise "Broken license in #{f}"
           end
         end
-        print Rainbow('.').green
+        yield(f) if block_given?
       end
-      print "\n"
-      puts "#{pluralize(@files.length, 'file')} checked, \
-everything looks #{Rainbow('pretty').green}"
     end
 
     # Fix them all.
     def fix
       @files.each do |f|
-        print "Fixing #{f}... "
         Document.new(f).fix(@license)
-        print "done\n"
+        yield(f) if block_given?
       end
-    end
-
-    private
-
-    def pluralize(num, text)
-      "#{num} #{num == 1 ? text : text + 's'}"
     end
   end
 

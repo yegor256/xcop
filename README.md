@@ -51,7 +51,7 @@ $ xcop --fix broken-file.xml
 To fix all files in the directory you can do:
 
 ```bash
-$ xcop $(find . -name '*.xml')
+$ xcop --fix $(find . -name '*.xml')
 ```
 
 ## How to use in `Rakefile`?
@@ -62,9 +62,10 @@ This is what you need there:
 require 'xcop/rake_task'
 desc 'Run XCop on all XML/XSL files in all directories'
 Xcop::RakeTask.new(:xcop) do |task|
-  task.license = 'LICENSE.txt'
-  task.includes = ['**/*.xml', '**/*.xsl']
-  task.excludes = ['target/**/*']
+  task.license = 'LICENSE.txt' # no license by default
+  task.quiet = true # FALSE by default
+  task.includes = ['**/*.xml', '**/*.xsl'] # xml|xsd|xhtml|xsl|html by default
+  task.excludes = ['target/**/*'] # empty by default
 end
 ```
 
@@ -89,6 +90,8 @@ You can integrate it with the help of
             <configuration>
               <target>
                 <apply executable="xcop" failonerror="true">
+                  <arg value="--license"/>
+                  <arg value="LICENSE.txt"/>
                   <fileset dir=".">
                     <include name="**/*.xml"/>
                     <include name="**/*.xsd"/>
@@ -118,6 +121,8 @@ Something like this should work:
   [...]
   <target name="xcop">
     <apply executable="xcop" failonerror="true">
+      <arg value="--license"/>
+      <arg value="LICENSE.txt"/>
       <fileset dir=".">
         <include name="**/*.xml"/>
         <include name="**/*.xsd"/>

@@ -19,7 +19,7 @@ Feature: Command Line Processing
 
     """
     When I run bin/xcop with "test.xml"
-    Then Stdout contains "pretty"
+    Then Stdout contains "test.xml looks good"
     And Exit code is zero
 
   Scenario: Validating correct XML file with license
@@ -38,8 +38,8 @@ Feature: Command Line Processing
     This is the license,
     which is very very strict!
     """
-    When I run bin/xcop with "--license LICENSE licensed.xml"
-    Then Stdout contains "pretty"
+    When I run bin/xcop with "--quiet --license LICENSE licensed.xml"
+    Then Stdout is empty
     And Exit code is zero
 
   Scenario: Validating incorrect XML file
