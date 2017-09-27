@@ -39,6 +39,14 @@ class TestXcop < Minitest::Test
     end
   end
 
+  def test_file_without_tail_eol
+    Dir.mktmpdir 'test9' do |dir|
+      f = File.join(dir, 'no-eol.xml')
+      File.write(f, '<just-this/>')
+      assert(Xcop::Document.new(f).diff != '')
+    end
+  end
+
   def test_license_presence
     Dir.mktmpdir 'test2' do |dir|
       f = File.join(dir, 'a.xml')
