@@ -66,7 +66,7 @@ Then(/^Stdout is empty$/) do
 end
 
 Then(/^Exit code is zero$/) do
-  raise "Non-zero exit code #{@exitstatus}" unless @exitstatus == 0
+  raise "Non-zero exit code #{@exitstatus}:\n#{@stdout}" unless @exitstatus == 0
 end
 
 Then(/^Exit code is not zero$/) do

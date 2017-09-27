@@ -78,9 +78,7 @@ module Xcop
       xml = Nokogiri::XML(File.open(@path), &:noblanks)
       ideal = xml.to_xml(indent: 2)
       now = File.read(@path)
-      Differ.format = :color
-      return Differ.diff_by_line(ideal, now).to_s unless now == ideal
-      ''
+      differ(ideal, now)
     end
 
     # Return the difference for the license.
@@ -89,9 +87,7 @@ module Xcop
       comment = xml.xpath('/comment()')[0]
       now = comment.nil? ? '' : comment.text.to_s.strip
       ideal = license.strip
-      Differ.format = :color
-      return Differ.diff_by_line(ideal, now).to_s unless now == ideal
-      ''
+      differ(ideal, now)
     end
 
     # Fixes the document.
@@ -105,6 +101,18 @@ module Xcop
       end
       ideal = xml.to_xml(indent: 2)
       File.write(@path, ideal)
+    end
+
+    private
+
+    def differ(ideal, fact)
+      return '' if ideal == fact
+      Differ.format = :color
+      Differ.diff_by_line(schars(ideal), schars(fact)).to_s
+    end
+
+    def schars(text)
+      text.gsub(/\n/, "\\n\n")
     end
   end
 end

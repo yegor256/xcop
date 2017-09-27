@@ -8,7 +8,7 @@ Feature: Rake tasks
     """
     require 'xcop/rake_task'
     Xcop::RakeTask.new(:xcop) do |task|
-      task.includes = ['**/*.xml']
+      task.includes = ['good.xml']
     end
     """
     And I have a "good.xml" file with content:

@@ -42,7 +42,7 @@ class TestXcop < Minitest::Test
   def test_file_without_tail_eol
     Dir.mktmpdir 'test9' do |dir|
       f = File.join(dir, 'no-eol.xml')
-      File.write(f, '<just-this/>')
+      File.write(f, "<?xml version=\"1.0\"?>\n<x/>")
       assert(Xcop::Document.new(f).diff != '')
     end
   end
