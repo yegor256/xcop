@@ -50,14 +50,14 @@ class TestXcop < Minitest::Test
   def test_license_presence
     Dir.mktmpdir 'test2' do |dir|
       f = File.join(dir, 'a.xml')
-      license = "Copyright (c) All Good People\nDon't touch it!\n\n"
+      license = " Copyright (c) All Good People\n Don't touch it!\n\n"
       File.write(
         f,
         [
           '<?xml version="1.0"?>',
           '<!--',
-          'Copyright (c) All Good People',
-          'Don\'t touch it!',
+          ' Copyright (c) All Good People',
+          ' Don\'t touch it!',
           '-->',
           '<hello>Dude!</hello>',
           ''
@@ -86,7 +86,7 @@ class TestXcop < Minitest::Test
   def test_fixes_document
     Dir.mktmpdir 'test3' do |dir|
       f = File.join(dir, 'bad.xml')
-      license = "Copyright (c) Me, Myself, and I\nLike it?\n\n"
+      license = " Copyright (c) Me, Myself, and I\n   Like it?\n\n"
       File.write(f, '<hello>My friend!</hello>')
       Xcop::Document.new(f).fix(license)
       assert_equal(Xcop::Document.new(f).diff, '')
