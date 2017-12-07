@@ -48,7 +48,8 @@ can ask it to "beautify" them, using `--fix` option:
 $ xcop --fix broken-file.xml
 ```
 
-To fix all files in the directory you can do:
+To fix all files in the directory you can do
+([won't work](https://askubuntu.com/questions/343727/) if your file names contain spaces):
 
 ```bash
 $ xcop --fix $(find . -name '*.xml')
