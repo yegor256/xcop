@@ -3,6 +3,7 @@ AllCops:
     - 'bin/**/*'
     - 'assets/**/*'
   DisplayCopNames: true
+  TargetRubyVersion: 2.2
 
 Metrics/CyclomaticComplexity:
   Max: 10
@@ -12,3 +13,5 @@ Style/MultilineMethodCallIndentation:
   Enabled: false
 Metrics/AbcSize:
   Enabled: false
+Metrics/BlockLength:
+  Max: 50

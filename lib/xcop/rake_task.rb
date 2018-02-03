@@ -1,6 +1,4 @@
-# encoding: utf-8
-#
-# Copyright (c) 2017 Yegor Bugayenko
+# Copyright (c) 2017-2018 Yegor Bugayenko
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the 'Software'), to deal
@@ -26,7 +24,7 @@ require_relative '../xcop'
 
 # Xcop rake task.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2017 Yegor Bugayenko
+# Copyright:: Copyright (c) 2017-2018 Yegor Bugayenko
 # License:: MIT
 module Xcop
   # Rake task.
@@ -40,7 +38,7 @@ module Xcop
 
     def initialize(*args, &task_block)
       @name = args.shift || :xcop
-      @includes = %w(xml xsd xhtml xsl html).map { |e| "**/*.#{e}" }
+      @includes = %w[xml xsd xhtml xsl html].map { |e| "**/*.#{e}" }
       @excludes = []
       @license = nil
       @quiet = false
@@ -68,8 +66,9 @@ module Xcop
       rescue StandardError => e
         abort(e.message)
       end
+      return if @quiet
       puts "\n#{pluralize(good.length, 'file')} checked, \
-everything looks #{Rainbow('pretty').green}" unless @quiet
+everything looks #{Rainbow('pretty').green}"
     end
 
     def pluralize(num, text)
