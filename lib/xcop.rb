@@ -30,15 +30,16 @@ require_relative 'xcop/version'
 module Xcop
   # Command line interface.
   class CLI
-    def initialize(files, license)
+    def initialize(files, license, nocolor = false)
       @files = files
       @license = license
+      @nocolor = nocolor
     end
 
     def run
       @files.each do |f|
         doc = Document.new(f)
-        diff = doc.diff
+        diff = doc.diff(@nocolor)
         unless diff.empty?
           puts diff
           raise "Invalid XML formatting in #{f}"
@@ -72,11 +73,11 @@ module Xcop
     end
 
     # Return the difference, if any (empty string if everything is clean).
-    def diff
+    def diff(nocolor = false)
       xml = Nokogiri::XML(File.open(@path), &:noblanks)
       ideal = xml.to_xml(indent: 2)
       now = File.read(@path)
-      differ(ideal, now)
+      differ(ideal, now, nocolor)
     end
 
     # Return the difference for the license.
@@ -103,10 +104,14 @@ module Xcop
 
     private
 
-    def differ(ideal, fact)
+    def differ(ideal, fact, nocolor = false)
       return '' if ideal == fact
-      Differ.format = :color
-      Differ.diff_by_line(schars(ideal), schars(fact)).to_s
+      if nocolor
+        Differ.diff_by_line(ideal, fact).to_s
+      else
+        Differ.format = :color
+        Differ.diff_by_line(schars(ideal), schars(fact)).to_s
+      end
     end
 
     def schars(text)
