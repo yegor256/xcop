@@ -36,6 +36,7 @@ opts = Slop.parse(ARGV, strict: true, help: true) do |o|
   o.bool '-q', '--quiet', 'Don\'t print anything if there are no errors'
   o.bool '--version', 'Show current version'
   o.bool '--fix', 'Fix all files instead of reporting their problems'
+  o.bool '--nocolor', 'Suppress colored output'
   o.string '--license', 'File name of the boilerplate head license'
 end
 
@@ -60,7 +61,7 @@ if opts.fix?
   end
 else
   begin
-    Xcop::CLI.new(opts.arguments, license).run do |f|
+    Xcop::CLI.new(opts.arguments, license, opts.nocolor?).run do |f|
       puts "#{f} looks good" unless opts.quiet?
     end
   rescue StandardError => e
