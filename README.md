@@ -136,9 +136,19 @@ Something like this should work:
 </project>
 ```
 
-## How to contribute?
+# How to contribute
 
-Just submit a pull request. Make sure `rake` passes.
+Read [these guidelines](https://www.yegor256.com/2014/04/15/github-guidelines.html).
+Make sure you build is green before you contribute
+your pull request. You will need to have [Ruby](https://www.ruby-lang.org/en/) 2.3+ and
+[Bundler](https://bundler.io/) installed. Then:
+
+```
+$ bundle update
+$ rake
+```
+
+If it's clean and you don't see any error messages, submit your pull request.
 
 ## License
 
