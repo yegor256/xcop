@@ -10,9 +10,9 @@
 [![PDD status](http://www.0pdd.com/svg?name=yegor256/xcop)](http://www.0pdd.com/p?name=yegor256/xcop)
 [![Gem Version](https://badge.fury.io/rb/xcop.svg)](http://badge.fury.io/rb/xcop)
 
-[![Code Climate](http://img.shields.io/codeclimate/github/yegor256/xcop.svg)](https://codeclimate.com/github/yegor256/xcop)
+[![Maintainability](https://api.codeclimate.com/v1/badges/396ec0584e0a84adc723/maintainability)](https://codeclimate.com/github/yegor256/xcop/maintainability)
 [![Test Coverage](https://img.shields.io/codecov/c/github/yegor256/xcop.svg)](https://codecov.io/github/yegor256/xcop?branch=master)
-[![Hits-of-Code](https://hitsofcode.com/github/yegor256/0dmx)](https://hitsofcode.com/view/github/yegor256/0dmx)
+[![Hits-of-Code](https://hitsofcode.com/github/yegor256/xcop)](https://hitsofcode.com/view/github/yegor256/xcop)
 
 This command line tool validates your XML files for proper formatting.
 If they are not formatted correctly, it prints the difference and

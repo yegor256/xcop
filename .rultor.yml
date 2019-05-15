@@ -7,7 +7,7 @@ install: |
 release:
   script: |-
     bundle install
-    rake
+    bundle exec rake
     rm -rf *.gem
     sed -i "s/1\.0\.snapshot/${tag}/g" lib/xcop/version.rb
     git add lib/xcop/version.rb
@@ -22,7 +22,7 @@ architect:
 merge:
   script: |-
     bundle install
-    rake
+    bundle exec rake
     pdd -f /dev/null
 deploy:
   script: |-
