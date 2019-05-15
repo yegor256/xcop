@@ -20,6 +20,9 @@ returns with an error. You can use it two ways: 1) to fail your build
 if any X-like files (XML, XSD, XSL, XHTML) are not formatted correctly,
 and 2) to format them correctly.
 
+Read this blog post of mine first:
+[XCOP—XML Style Checker](https://www.yegor256.com/2017/08/29/xcop.html).
+
 Install it first:
 
 ```bash
