@@ -1,3 +1,5 @@
+<img src="/logo.svg" width="64px"/>
+
 [![EO principles respected here](http://www.elegantobjects.org/badge.svg)](http://www.elegantobjects.org)
 [![Managed by Zerocracy](https://www.0crat.com/badge/C3RFVLU72.svg)](https://www.0crat.com/p/C3RFVLU72)
 [![DevOps By Rultor.com](http://www.rultor.com/b/yegor256/xcop)](http://www.rultor.com/p/yegor256/xcop)
@@ -7,11 +9,10 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/orvfo2qgmd1d7a2i?svg=true)](https://ci.appveyor.com/project/yegor256/xcop)
 [![PDD status](http://www.0pdd.com/svg?name=yegor256/xcop)](http://www.0pdd.com/p?name=yegor256/xcop)
 [![Gem Version](https://badge.fury.io/rb/xcop.svg)](http://badge.fury.io/rb/xcop)
-[![Dependency Status](https://gemnasium.com/yegor256/xcop.svg)](https://gemnasium.com/yegor256/xcop)
+
 [![Code Climate](http://img.shields.io/codeclimate/github/yegor256/xcop.svg)](https://codeclimate.com/github/yegor256/xcop)
 [![Test Coverage](https://img.shields.io/codecov/c/github/yegor256/xcop.svg)](https://codecov.io/github/yegor256/xcop?branch=master)
-
-## What this is for?
+[![Hits-of-Code](https://hitsofcode.com/github/yegor256/0dmx)](https://hitsofcode.com/view/github/yegor256/0dmx)
 
 This command line tool validates your XML files for proper formatting.
 If they are not formatted correctly, it prints the difference and
@@ -19,15 +20,11 @@ returns with an error. You can use it two ways: 1) to fail your build
 if any X-like files (XML, XSD, XSL, XHTML) are not formatted correctly,
 and 2) to format them correctly.
 
-## How to install?
-
 Install it first:
 
 ```bash
 $ gem install xcop
 ```
-
-## How to run?
 
 Run it locally and read its output:
 
@@ -136,7 +133,7 @@ Something like this should work:
 </project>
 ```
 
-# How to contribute
+## How to contribute
 
 Read [these guidelines](https://www.yegor256.com/2014/04/15/github-guidelines.html).
 Make sure you build is green before you contribute
@@ -145,31 +142,7 @@ your pull request. You will need to have [Ruby](https://www.ruby-lang.org/en/) 2
 
 ```
 $ bundle update
-$ rake
+$ bundle exec rake
 ```
 
 If it's clean and you don't see any error messages, submit your pull request.
-
-## License
-
-(The MIT License)
-
-Copyright (c) 2017-2018 Yegor Bugayenko
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the 'Software'), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
