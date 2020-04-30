@@ -72,6 +72,36 @@ Xcop::RakeTask.new(:xcop) do |task|
 end
 ```
 
+## How to use as GitHub action?
+
+Create new workflow file in repository under `.github/workflows/xcop.yml`:
+```yaml
+---
+name: XCOP
+"on":
+  # run on push to master events
+  push:
+    branches:
+      - master
+  # run on pull requests to master
+  pull_request:
+    brranches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: g4s8/xcop-action@master
+```
+To customize license location or files pattern use action inputs `license` and `files`:
+```yaml
+- uses: g4s8/xcop-action@master
+  with:
+    license: MY_LICENSE.txt
+    files: "src/*.xml"
+```
+
 ## How to use in Maven `pom.xml`?
 
 You can integrate it with the help of
