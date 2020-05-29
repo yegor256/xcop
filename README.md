@@ -24,7 +24,7 @@ and 2) to format them correctly.
 Read this blog post of mine first:
 [_XCOP—XML Style Checker_](https://www.yegor256.com/2017/08/29/xcop.html).
 
-Install it first:
+Install it first (read below if you can't install it):
 
 ```bash
 $ gem install xcop
