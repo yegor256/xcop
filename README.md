@@ -85,7 +85,7 @@ name: XCOP
       - master
   # run on pull requests to master
   pull_request:
-    brranches:
+    branches:
       - master
 jobs:
   build:
