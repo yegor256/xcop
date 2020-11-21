@@ -106,16 +106,14 @@ module Xcop
 
     def differ(ideal, fact, nocolor = false)
       return '' if ideal == fact
-      if nocolor
-        Differ.diff_by_line(ideal, fact).to_s
-      else
+      unless nocolor
         Differ.format = :color
-        Differ.diff_by_line(schars(ideal), schars(fact)).to_s
       end
+      Differ.diff_by_line(schars(ideal), schars(fact)).to_s
     end
 
     def schars(text)
-      text.gsub(/\n/, "\\n\n")
+      text.gsub(/\n/, "\n")
     end
   end
 end
