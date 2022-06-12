@@ -31,25 +31,29 @@ class TestRakeTask < Minitest::Test
   def test_basic
     Dir.mktmpdir 'test' do |dir|
       Dir.chdir(dir)
-      File.write('a.xml', "<?xml version=\"1.0\"?>\n<x/>\n")
+      f = File.join(dir, 'a.xml')
+      File.write(f, "<?xml version=\"1.0\"?>\n<x/>\n")
       Xcop::RakeTask.new(:xcop1) do |task|
         task.quiet = true
         # task.license = 'LICENSE.txt'
       end
       Rake::Task['xcop1'].invoke
+      File.delete(f)
     end
   end
 
   def test_with_broken_xml
     Dir.mktmpdir 'test' do |dir|
       Dir.chdir(dir)
-      File.write('broken.xml', "<z><a><b></b></a>\n\n</z>")
+      f = File.join(dir, 'broken.xml')
+      File.write(f, "<z><a><b></b></a>\n\n</z>")
       Xcop::RakeTask.new(:xcop2) do |task|
         task.excludes = ['test/**/*']
       end
       assert_raises SystemExit do
         Rake::Task['xcop2'].invoke
       end
+      File.delete(f)
     end
   end
 end
