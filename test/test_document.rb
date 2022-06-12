@@ -34,6 +34,7 @@ class TestXcop < Minitest::Test
       f = File.join(dir, 'a.xml')
       File.write(f, "<?xml version=\"1.0\"?>\n<hello>Dude!</hello>\n")
       assert_equal(Xcop::Document.new(f).diff, '')
+      File.delete(f)
     end
   end
 
@@ -42,6 +43,7 @@ class TestXcop < Minitest::Test
       f = File.join(dir, 'no-eol.xml')
       File.write(f, "<?xml version=\"1.0\"?>\n<x/>")
       assert(Xcop::Document.new(f).diff != '')
+      File.delete(f)
     end
   end
 
@@ -62,6 +64,7 @@ class TestXcop < Minitest::Test
         ].join("\n")
       )
       assert_equal(Xcop::Document.new(f).ldiff(license), '')
+      File.delete(f)
     end
   end
 
@@ -78,6 +81,7 @@ class TestXcop < Minitest::Test
         ].join("\n")
       )
       assert(Xcop::Document.new(f).ldiff(license) != '')
+      File.delete(f)
     end
   end
 
@@ -89,6 +93,7 @@ class TestXcop < Minitest::Test
       Xcop::Document.new(f).fix(license)
       assert_equal(Xcop::Document.new(f).diff, '')
       assert_equal(Xcop::Document.new(f).ldiff(license), '')
+      File.delete(f)
     end
   end
 
@@ -100,6 +105,7 @@ class TestXcop < Minitest::Test
       Xcop::Document.new(f).fix(license)
       Xcop::Document.new(f).fix(license)
       assert_equal(Nokogiri::XML(File.read(f)).xpath('/comment()').length, 1)
+      File.delete(f)
     end
   end
 end
