@@ -49,6 +49,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'codecov', '0.6.0'
   s.add_development_dependency 'cucumber', '8.0.0'
   s.add_development_dependency 'minitest', '5.15.0'
+  s.add_development_dependency 'panolint', '0.1.4'
   s.add_development_dependency 'rake', '13.0.6'
   s.add_development_dependency 'rdoc', '6.4.0'
   s.add_development_dependency 'rubocop', '1.30.1'
