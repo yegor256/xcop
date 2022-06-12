@@ -30,14 +30,16 @@ if Gem::Version.new(Nokogiri::VERSION) < Gem::Version.new('1.8')
   puts "Nokogiri version #{Nokogiri::VERSION} is too old, 1.8+ is required"
 end
 
-file_cfg = []
-if File.exist?('.xcop')
-  file_cfg += File.open('.xcop').read.gsub(/\s+/, " ").strip.split(/\s/)
+def config(path)
+  f = File.expand_path(path)
+  args = []
+  args += File.readlines(f).map(&:strip) if File.exist?(f)
+  args
 end
 
-merged = ARGV + file_cfg
+args = config('~/.xcop') + config('.xcop') + ARGV
 
-opts = Slop.parse(merged, strict: true, help: true) do |o|
+opts = Slop.parse(args, strict: true, help: true) do |o|
   o.banner = "Usage (#{Xcop::VERSION}): xcop [options] [files...]"
   o.bool '-h', '--help', 'Show these instructions'
   o.bool '-q', '--quiet', 'Don\'t print anything if there are no errors'
