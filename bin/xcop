@@ -45,6 +45,8 @@ opts = Slop.parse(merged, strict: true, help: true) do |o|
   o.bool '--fix', 'Fix all files instead of reporting their problems'
   o.bool '--nocolor', 'Suppress colored output'
   o.string '--license', 'File name of the boilerplate head license'
+  o.array '--include', 'Glob pattern(s) to include'
+  o.array '--exclude', 'Glob pattern(s) to exclude'
 end
 
 if opts.help?
@@ -62,13 +64,29 @@ Encoding.default_internal = Encoding::UTF_8
 
 license = opts.license? ? File.read(opts[:license]) : ''
 
+files = []
+
+if opts[:include]
+  opts[:include].each do |glob|
+    files += Dir.glob(glob)
+  end
+end
+
+if opts[:exclude]
+  opts[:exclude].each do |glob|
+    files -= Dir.glob(glob)
+  end
+end
+
+files += opts.arguments.map { |f| File.expand_path(f) }
+
 if opts.fix?
-  Xcop::CLI.new(opts.arguments, license).fix do |f|
+  Xcop::CLI.new(files, license).fix do |f|
     puts "#{f} fixed" unless opts.quiet?
   end
 else
   begin
-    Xcop::CLI.new(opts.arguments, license, nocolor: opts.nocolor?).run do |f|
+    Xcop::CLI.new(files, license, nocolor: opts.nocolor?).run do |f|
       puts "#{f} looks good" unless opts.quiet?
     end
   rescue StandardError => e

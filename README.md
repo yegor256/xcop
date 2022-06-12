@@ -58,6 +58,24 @@ To fix all files in the directory you can do
 $ xcop --fix $(find . -name '*.xml')
 ```
 
+## Defaults
+
+You can put command line options into `.xcop` file in the directory
+where you start `xcop`. Each option should take a single line in the file.
+They all will be _added_ to the list of options you specify. For example:
+
+```
+--license LICENSE.txt
+--nocolor
+--quiet
+--include **/*
+--exclude **/*.xsl
+--exclude **/*.html
+```
+
+You can also create `~/.xcop` file (in your personal home directory), which
+will also be read and _added_ to the command line options.
+
 ## How to use in `Rakefile`?
 
 This is what you need there:
