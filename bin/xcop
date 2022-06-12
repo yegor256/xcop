@@ -64,7 +64,14 @@ end
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
 
-license = opts.license? ? File.read(opts[:license]) : ''
+license = ''
+if opts.license?
+  unless File.exist?(opts[:license])
+    puts "License file is absent: #{opts[:license]}"
+    exit -1
+  end
+  license = File.read(opts[:license])
+end
 
 files = []
 
