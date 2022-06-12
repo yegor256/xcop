@@ -23,6 +23,7 @@ STDOUT.sync = true
 
 require 'slop'
 require 'nokogiri'
+require 'set'
 require_relative '../lib/xcop/cli'
 require_relative '../lib/xcop/version'
 
@@ -73,21 +74,21 @@ if opts.license?
   license = File.read(opts[:license])
 end
 
-files = []
+files = Set.new
 
 if opts[:include]
   opts[:include].each do |glob|
-    files += Dir.glob(glob)
-  end
-end
-
-if opts[:exclude]
-  opts[:exclude].each do |glob|
-    files -= Dir.glob(glob)
+    files += Dir.glob(glob).map { |f| File.expand_path(f) }
   end
 end
 
 files += opts.arguments.map { |f| File.expand_path(f) }
+
+if opts[:exclude]
+  opts[:exclude].each do |glob|
+    files -= Dir.glob(glob).map { |f| File.expand_path(f) }
+  end
+end
 
 if opts.fix?
   Xcop::CLI.new(files, license).fix do |f|
