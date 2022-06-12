@@ -28,4 +28,3 @@ if ENV['CI'] == 'true'
 end
 
 require 'minitest/autorun'
-require_relative '../lib/xcop'

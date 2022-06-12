@@ -22,9 +22,9 @@ require 'minitest/autorun'
 require 'nokogiri'
 require 'tmpdir'
 require 'slop'
-require_relative '../lib/xcop'
+require_relative '../lib/xcop/document'
 
-# Xcop main module test.
+# Test for Document class.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2017-2022 Yegor Bugayenko
 # License:: MIT

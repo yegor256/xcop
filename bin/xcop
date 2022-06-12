@@ -23,7 +23,7 @@ STDOUT.sync = true
 
 require 'slop'
 require 'nokogiri'
-require_relative '../lib/xcop'
+require_relative '../lib/xcop/cli'
 require_relative '../lib/xcop/version'
 
 if Gem::Version.new(Nokogiri::VERSION) < Gem::Version.new('1.8')

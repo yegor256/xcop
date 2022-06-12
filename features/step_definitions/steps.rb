@@ -22,7 +22,6 @@ require 'nokogiri'
 require 'tmpdir'
 require 'slop'
 require 'English'
-require_relative '../../lib/xcop'
 
 Before do
   @cwd = Dir.pwd

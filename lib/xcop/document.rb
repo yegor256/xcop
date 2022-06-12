@@ -21,48 +21,12 @@
 require 'nokogiri'
 require 'differ'
 require 'rainbow'
-require_relative 'xcop/version'
+require_relative 'version'
 
-# Xcop main module.
+# One document.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2017-2022 Yegor Bugayenko
 # License:: MIT
-class Xcop::CLI
-  def initialize(files, license, nocolor: false)
-    @files = files
-    @license = license
-    @nocolor = nocolor
-  end
-
-  def run
-    @files.each do |f|
-      doc = Xcop::Document.new(f)
-      diff = doc.diff(nocolor: @nocolor)
-      unless diff.empty?
-        puts diff
-        raise "Invalid XML formatting in #{f}"
-      end
-      unless @license.empty?
-        ldiff = doc.ldiff(@license)
-        unless ldiff.empty?
-          puts ldiff
-          raise "Broken license in #{f}"
-        end
-      end
-      yield(f) if block_given?
-    end
-  end
-
-  # Fix them all.
-  def fix
-    @files.each do |f|
-      Xcop::Document.new(f).fix(@license)
-      yield(f) if block_given?
-    end
-  end
-end
-
-# One document.
 class Xcop::Document
   # Ctor.
   # +path+:: Path of it

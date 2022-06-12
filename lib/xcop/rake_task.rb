@@ -20,7 +20,7 @@
 
 require 'rake'
 require 'rake/tasklib'
-require_relative '../xcop'
+require_relative '../xcop/cli'
 
 # Xcop rake task.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
@@ -48,7 +48,6 @@ class Xcop::RakeTask < Rake::TaskLib
   private
 
   def run
-    require 'xcop'
     puts 'Running xcop...' unless @quiet
     bad = Dir.glob(@excludes)
     good = Dir.glob(@includes).reject { |f| bad.include?(f) }
