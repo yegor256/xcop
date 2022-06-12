@@ -2,7 +2,7 @@ assets:
   rubygems.yml: yegor256/home#assets/rubygems.yml
 install: |
   pdd -f /dev/null
-  bundle install
+  sudo bundle install
 release:
   script: |-
     bundle exec rake
