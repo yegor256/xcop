@@ -42,9 +42,7 @@ end
 
 Given(/^I have a "([^"]*)" file with content:$/) do |file, text|
   FileUtils.mkdir_p(File.dirname(file)) unless File.exist?(file)
-  File.open(file, 'w') do |f|
-    f.write(text.gsub(/\\xFF/, 0xFF.chr))
-  end
+  File.write(file, text.gsub(/\\xFF/, 0xFF.chr))
 end
 
 When(%r{^I run bin/xcop with "([^"]*)"$}) do |arg|
@@ -54,9 +52,7 @@ When(%r{^I run bin/xcop with "([^"]*)"$}) do |arg|
 end
 
 Then(/^Stdout contains "([^"]*)"$/) do |txt|
-  unless @stdout.include?(txt)
-    raise "STDOUT doesn't contain '#{txt}':\n#{@stdout}"
-  end
+  raise "STDOUT doesn't contain '#{txt}':\n#{@stdout}" unless @stdout.include?(txt)
 end
 
 Then(/^Stdout is empty$/) do

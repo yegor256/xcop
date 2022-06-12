@@ -26,53 +26,46 @@ require_relative '../xcop'
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2017-2022 Yegor Bugayenko
 # License:: MIT
-module Xcop
-  # Rake task.
-  class RakeTask < Rake::TaskLib
-    attr_accessor :name
-    attr_accessor :fail_on_error
-    attr_accessor :excludes
-    attr_accessor :includes
-    attr_accessor :license
-    attr_accessor :quiet
+class Xcop::RakeTask < Rake::TaskLib
+  attr_accessor :name, :fail_on_error, :excludes, :includes, :license, :quiet
 
-    def initialize(*args, &task_block)
-      @name = args.shift || :xcop
-      @includes = %w[xml xsd xhtml xsl html].map { |e| "**/*.#{e}" }
-      @excludes = []
-      @license = nil
-      @quiet = false
-      desc 'Run Xcop' unless ::Rake.application.last_description
-      task(name, *args) do |_, task_args|
-        RakeFileUtils.send(:verbose, true) do
-          yield(*[self, task_args].slice(0, task_block.arity)) if block_given?
-          run
-        end
+  def initialize(*args, &task_block)
+    super()
+    @name = args.shift || :xcop
+    @includes = %w[xml xsd xhtml xsl html].map { |e| "**/*.#{e}" }
+    @excludes = []
+    @license = nil
+    @quiet = false
+    desc 'Run Xcop' unless ::Rake.application.last_description
+    task(name, *args) do |_, task_args|
+      RakeFileUtils.send(:verbose, true) do
+        yield(*[self, task_args].slice(0, task_block.arity)) if block_given?
+        run
       end
     end
+  end
 
-    private
+  private
 
-    def run
-      require 'xcop'
-      puts 'Running xcop...' unless @quiet
-      bad = Dir.glob(@excludes)
-      good = Dir.glob(@includes).reject { |f| bad.include?(f) }
-      puts "Inspecting #{pluralize(good.length, 'file')}..." unless @quiet
-      begin
-        Xcop::CLI.new(good, @license.nil? ? '' : File.read(@license)).run do
-          print Rainbow('.').green unless @quiet
-        end
-      rescue StandardError => e
-        abort(e.message)
+  def run
+    require 'xcop'
+    puts 'Running xcop...' unless @quiet
+    bad = Dir.glob(@excludes)
+    good = Dir.glob(@includes).reject { |f| bad.include?(f) }
+    puts "Inspecting #{pluralize(good.length, 'file')}..." unless @quiet
+    begin
+      Xcop::CLI.new(good, @license.nil? ? '' : File.read(@license)).run do
+        print Rainbow('.').green unless @quiet
       end
-      return if @quiet
-      puts "\n#{pluralize(good.length, 'file')} checked, \
+    rescue StandardError => e
+      abort(e.message)
+    end
+    return if @quiet
+    puts "\n#{pluralize(good.length, 'file')} checked, \
 everything looks #{Rainbow('pretty').green}"
-    end
+  end
 
-    def pluralize(num, text)
-      "#{num} #{num == 1 ? text : text + 's'}"
-    end
+  def pluralize(num, text)
+    "#{num} #{num == 1 ? text : "#{text}s"}"
   end
 end

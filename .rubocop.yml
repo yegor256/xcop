@@ -4,6 +4,8 @@ AllCops:
     - 'assets/**/*'
   DisplayCopNames: true
   TargetRubyVersion: 2.2
+  NewCops: enable
+  SuggestExtensions: false
 
 Metrics/CyclomaticComplexity:
   Max: 10
@@ -15,3 +17,7 @@ Metrics/AbcSize:
   Enabled: false
 Metrics/BlockLength:
   Max: 50
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+Style/ClassAndModuleChildren:
+  Enabled: false

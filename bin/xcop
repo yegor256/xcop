@@ -68,7 +68,7 @@ if opts.fix?
   end
 else
   begin
-    Xcop::CLI.new(opts.arguments, license, opts.nocolor?).run do |f|
+    Xcop::CLI.new(opts.arguments, license, nocolor: opts.nocolor?).run do |f|
       puts "#{f} looks good" unless opts.quiet?
     end
   rescue StandardError => e

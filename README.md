@@ -1,30 +1,31 @@
-<img src="/logo.svg" width="64px"/>
+<img alt="XCOP logo" src="/logo.svg" width="64px"/>
 
 [![EO principles respected here](https://www.elegantobjects.org/badge.svg)](https://www.elegantobjects.org)
 [![Managed by Zerocracy](https://www.0crat.com/badge/C3RFVLU72.svg)](https://www.0crat.com/p/C3RFVLU72)
 [![DevOps By Rultor.com](http://www.rultor.com/b/yegor256/xcop)](http://www.rultor.com/p/yegor256/xcop)
 [![We recommend RubyMine](https://www.elegantobjects.org/rubymine.svg)](https://www.jetbrains.com/ruby/)
 
-[![Build Status](https://travis-ci.org/yegor256/xcop.svg)](https://travis-ci.org/yegor256/xcop)
-[![Build status](https://ci.appveyor.com/api/projects/status/orvfo2qgmd1d7a2i?svg=true)](https://ci.appveyor.com/project/yegor256/xcop)
+[![rake](https://github.com/yegor256/xcop/actions/workflows/rake.yml/badge.svg)](https://github.com/yegor256/xcop/actions/workflows/rake.yml)
 [![PDD status](http://www.0pdd.com/svg?name=yegor256/xcop)](http://www.0pdd.com/p?name=yegor256/xcop)
 [![Gem Version](https://badge.fury.io/rb/xcop.svg)](http://badge.fury.io/rb/xcop)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/yegor256/xcop/blob/master/LICENSE.txt)
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/396ec0584e0a84adc723/maintainability)](https://codeclimate.com/github/yegor256/xcop/maintainability)
 [![Test Coverage](https://img.shields.io/codecov/c/github/yegor256/xcop.svg)](https://codecov.io/github/yegor256/xcop?branch=master)
+![Lines of code](https://img.shields.io/tokei/lines/github/yegor256/xcop)
 [![Hits-of-Code](https://hitsofcode.com/github/yegor256/xcop)](https://hitsofcode.com/view/github/yegor256/xcop)
 
 This command line tool validates your XML files for proper formatting.
 If they are not formatted correctly, it prints the difference and
-returns with an error. You can use it two ways: 1) to fail your build
-if any X-like files (XML, XSD, XSL, XHTML) are not formatted correctly,
-and 2) to format them correctly.
+exits with an error. You can use it two ways: 1) to fail your build
+if any XML-ish files (for example, XML, XSD, XSL, or XHTML) are not formatted correctly,
+and 2) to format them correctly using `--fix` option.
 
-Read this blog post of mine first:
+Read this blog post first:
 [_XCOP—XML Style Checker_](https://www.yegor256.com/2017/08/29/xcop.html).
 
-Install it first (read below if you can't install it):
+Make sure you have [Ruby installed](https://www.ruby-lang.org/en/documentation/installation/)
+and then install the tool:
 
 ```bash
 $ gem install xcop
@@ -75,6 +76,7 @@ end
 ## How to use as GitHub action?
 
 Create new workflow file in repository under `.github/workflows/xcop.yml`:
+
 ```yaml
 ---
 name: XCOP
@@ -94,7 +96,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: g4s8/xcop-action@master
 ```
+
 To customize license location or files pattern use action inputs `license` and `files`:
+
 ```yaml
 - uses: g4s8/xcop-action@master
   with:

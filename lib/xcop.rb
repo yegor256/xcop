@@ -27,95 +27,92 @@ require_relative 'xcop/version'
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2017-2022 Yegor Bugayenko
 # License:: MIT
-module Xcop
-  # Command line interface.
-  class CLI
-    def initialize(files, license, nocolor = false)
-      @files = files
-      @license = license
-      @nocolor = nocolor
-    end
+class Xcop::CLI
+  def initialize(files, license, nocolor: false)
+    @files = files
+    @license = license
+    @nocolor = nocolor
+  end
 
-    def run
-      @files.each do |f|
-        doc = Document.new(f)
-        diff = doc.diff(@nocolor)
-        unless diff.empty?
-          puts diff
-          raise "Invalid XML formatting in #{f}"
-        end
-        unless @license.empty?
-          ldiff = doc.ldiff(@license)
-          unless ldiff.empty?
-            puts ldiff
-            raise "Broken license in #{f}"
-          end
-        end
-        yield(f) if block_given?
+  def run
+    @files.each do |f|
+      doc = Xcop::Document.new(f)
+      diff = doc.diff(nocolor: @nocolor)
+      unless diff.empty?
+        puts diff
+        raise "Invalid XML formatting in #{f}"
       end
-    end
-
-    # Fix them all.
-    def fix
-      @files.each do |f|
-        Document.new(f).fix(@license)
-        yield(f) if block_given?
+      unless @license.empty?
+        ldiff = doc.ldiff(@license)
+        unless ldiff.empty?
+          puts ldiff
+          raise "Broken license in #{f}"
+        end
       end
+      yield(f) if block_given?
     end
   end
 
-  # One document.
-  class Document
-    # Ctor.
-    # +path+:: Path of it
-    def initialize(path)
-      @path = path
+  # Fix them all.
+  def fix
+    @files.each do |f|
+      Xcop::Document.new(f).fix(@license)
+      yield(f) if block_given?
     end
+  end
+end
 
-    # Return the difference, if any (empty string if everything is clean).
-    def diff(nocolor = false)
-      xml = Nokogiri::XML(File.open(@path), &:noblanks)
-      ideal = xml.to_xml(indent: 2)
-      now = File.read(@path)
-      differ(ideal, now, nocolor)
+# One document.
+class Xcop::Document
+  # Ctor.
+  # +path+:: Path of it
+  def initialize(path)
+    @path = path
+  end
+
+  # Return the difference, if any (empty string if everything is clean).
+  def diff(nocolor: false)
+    xml = Nokogiri::XML(File.open(@path), &:noblanks)
+    ideal = xml.to_xml(indent: 2)
+    now = File.read(@path)
+    differ(ideal, now, nocolor: nocolor)
+  end
+
+  # Return the difference for the license.
+  def ldiff(license)
+    xml = Nokogiri::XML(File.open(@path), &:noblanks)
+    comment = xml.xpath('/comment()')[0]
+    now = comment.nil? ? '' : comment.text.to_s.strip
+    ideal = license.strip
+    differ(ideal, now)
+  end
+
+  # Fixes the document.
+  def fix(license = '')
+    xml = Nokogiri::XML(File.open(@path), &:noblanks)
+    unless license.empty?
+      xml.xpath('/comment()').remove
+      xml.children.before(
+        Nokogiri::XML::Comment.new(xml, "\n#{license.strip}\n")
+      )
     end
+    ideal = xml.to_xml(indent: 2)
+    File.write(@path, ideal)
+  end
 
-    # Return the difference for the license.
-    def ldiff(license)
-      xml = Nokogiri::XML(File.open(@path), &:noblanks)
-      comment = xml.xpath('/comment()')[0]
-      now = comment.nil? ? '' : comment.text.to_s.strip
-      ideal = license.strip
-      differ(ideal, now)
+  private
+
+  def differ(ideal, fact, nocolor: false)
+    return '' if ideal == fact
+    if nocolor
+      Differ.diff_by_line(ideal, fact).to_s
+    else
+      Differ.format = :color
+      Differ.diff_by_line(schars(ideal), schars(fact)).to_s
     end
+  end
 
-    # Fixes the document.
-    def fix(license = '')
-      xml = Nokogiri::XML(File.open(@path), &:noblanks)
-      unless license.empty?
-        xml.xpath('/comment()').remove
-        xml.children.before(
-          Nokogiri::XML::Comment.new(xml, "\n#{license.strip}\n")
-        )
-      end
-      ideal = xml.to_xml(indent: 2)
-      File.write(@path, ideal)
-    end
-
-    private
-
-    def differ(ideal, fact, nocolor = false)
-      return '' if ideal == fact
-      if nocolor
-        Differ.diff_by_line(ideal, fact).to_s
-      else
-        Differ.format = :color
-        Differ.diff_by_line(schars(ideal), schars(fact)).to_s
-      end
-    end
-
-    def schars(text)
-      text.gsub(/\n/, "\\n\n")
-    end
+  def schars(text)
+    text.gsub(/\n/, "\\n\n")
   end
 end
