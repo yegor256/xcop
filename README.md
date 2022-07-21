@@ -61,7 +61,8 @@ $ xcop --fix $(find . -name '*.xml')
 
 You can put command line options into `.xcop` file in the directory
 where you start `xcop`. Each option should take a single line in the file.
-They all will be _added_ to the list of options you specify. For example:
+They all will be _added_ to the list of options you specify. For example,
+as it was suggested in [this blog post](https://www.yegor256.com/2022/07/20/command-line-defaults.html):
 
 ```
 --license LICENSE.txt
