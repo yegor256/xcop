@@ -8,7 +8,6 @@
 [![PDD status](http://www.0pdd.com/svg?name=yegor256/xcop)](http://www.0pdd.com/p?name=yegor256/xcop)
 [![Gem Version](https://badge.fury.io/rb/xcop.svg)](http://badge.fury.io/rb/xcop)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/yegor256/xcop/blob/master/LICENSE.txt)
-
 [![Maintainability](https://api.codeclimate.com/v1/badges/396ec0584e0a84adc723/maintainability)](https://codeclimate.com/github/yegor256/xcop/maintainability)
 [![Test Coverage](https://img.shields.io/codecov/c/github/yegor256/xcop.svg)](https://codecov.io/github/yegor256/xcop?branch=master)
 ![Lines of code](https://img.shields.io/tokei/lines/github/yegor256/xcop)
@@ -65,12 +64,12 @@ They all will be _added_ to the list of options you specify. For example,
 as it was suggested in [this blog post](https://www.yegor256.com/2022/07/20/command-line-defaults.html):
 
 ```
---license LICENSE.txt
+--license=LICENSE.txt
 --nocolor
 --quiet
---include **/*
---exclude **/*.xsl
---exclude **/*.html
+--include=**/*
+--exclude=**/*.xsl
+--exclude=**/*.html
 ```
 
 You can also create `~/.xcop` file (in your personal home directory), which
