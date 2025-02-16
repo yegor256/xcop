@@ -26,7 +26,7 @@ require 'English'
 Before do
   @cwd = Dir.pwd
   @dir = Dir.mktmpdir('test')
-  FileUtils.mkdir_p(@dir) unless File.exist?(@dir)
+  FileUtils.mkdir_p(@dir)
   Dir.chdir(@dir)
   @opts = Slop.parse ['-v', '-s', @dir] do |o|
     o.bool '-v', '--verbose'
@@ -36,12 +36,12 @@ end
 
 After do
   Dir.chdir(@cwd)
-  FileUtils.rm_rf(@dir) if File.exist?(@dir)
+  FileUtils.rm_rf(@dir)
 end
 
 Given(/^I have a "([^"]*)" file with content:$/) do |file, text|
   FileUtils.mkdir_p(File.dirname(file)) unless File.exist?(file)
-  File.write(file, text.gsub(/\\xFF/, 0xFF.chr))
+  File.write(file, text.gsub('\\xFF', 0xFF.chr))
 end
 
 When(%r{^I run bin/xcop with "([^"]*)"$}) do |arg|

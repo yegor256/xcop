@@ -31,7 +31,7 @@ def version
   Gem::Specification.load(Dir['*.gemspec'].first).version
 end
 
-task default: %i[clean test features rubocop copyright]
+task default: %i[clean test features rubocop]
 
 require 'rake/testtask'
 desc 'Run all unit tests'
@@ -42,13 +42,10 @@ Rake::TestTask.new(:test) do |test|
   test.verbose = false
 end
 
-require 'rdoc/task'
-desc 'Build RDoc documentation'
-Rake::RDocTask.new do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "#{name} #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+require 'yard'
+desc 'Build Yard documentation'
+YARD::Rake::YardocTask.new do |t|
+  t.files = ['lib/**/*.rb']
 end
 
 require 'rubocop/rake_task'
@@ -65,12 +62,4 @@ Cucumber::Rake::Task.new(:features) do
 end
 Cucumber::Rake::Task.new(:'features:html') do |t|
   t.profile = 'html_report'
-end
-
-task :copyright do
-  sh "grep -q -r '2017-#{Date.today.strftime('%Y')}' \
-    --include '*.rb' \
-    --include '*.txt' \
-    --include 'Rakefile' \
-    ."
 end

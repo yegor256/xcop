@@ -77,6 +77,6 @@ class Xcop::Document
   end
 
   def schars(text)
-    text.gsub(/\n/, "\\n\n")
+    text.gsub("\n", "\\n\n")
   end
 end
