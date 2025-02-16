@@ -57,11 +57,13 @@ class Xcop::RakeTask < Rake::TaskLib
         print Rainbow('.').green unless @quiet
       end
     rescue StandardError => e
+      puts e.message
       abort(e.message)
     end
     return if @quiet
-    puts "\n#{pluralize(good.length, 'file')} checked, \
-everything looks #{Rainbow('pretty').green}"
+    puts \
+      "\n#{pluralize(good.length, 'file')} checked, " \
+      "everything looks #{Rainbow('pretty').green}"
   end
 
   def pluralize(num, text)
