@@ -29,9 +29,8 @@ require_relative 'document'
 # Copyright:: Copyright (c) 2017-2025 Yegor Bugayenko
 # License:: MIT
 class Xcop::CLI
-  def initialize(files, license, nocolor: false)
+  def initialize(files, nocolor: false)
     @files = files
-    @license = license
     @nocolor = nocolor
   end
 
@@ -43,13 +42,6 @@ class Xcop::CLI
         puts diff
         raise "Invalid XML formatting in #{f}"
       end
-      unless @license.empty?
-        ldiff = doc.ldiff(@license)
-        unless ldiff.empty?
-          puts ldiff
-          raise "Broken license in #{f}"
-        end
-      end
       yield(f) if block_given?
     end
   end
@@ -57,7 +49,7 @@ class Xcop::CLI
   # Fix them all.
   def fix
     @files.each do |f|
-      Xcop::Document.new(f).fix(@license)
+      Xcop::Document.new(f).fix
       yield(f) if block_given?
     end
   end

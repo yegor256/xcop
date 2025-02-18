@@ -64,7 +64,6 @@ They all will be _added_ to the list of options you specify. For example,
 as it was suggested in [this blog post](https://www.yegor256.com/2022/07/20/command-line-defaults.html):
 
 ```
---license=LICENSE.txt
 --nocolor
 --quiet
 --include=**/*
@@ -83,7 +82,6 @@ This is what you need there:
 require 'xcop/rake_task'
 desc 'Run XCop on all XML/XSL files in all directories'
 Xcop::RakeTask.new(:xcop) do |task|
-  task.license = 'LICENSE.txt' # no license by default
   task.quiet = true # FALSE by default
   task.includes = ['**/*.xml', '**/*.xsl'] # xml|xsd|xhtml|xsl|html by default
   task.excludes = ['target/**/*'] # empty by default
@@ -114,12 +112,11 @@ jobs:
       - uses: g4s8/xcop-action@master
 ```
 
-To customize license location or files pattern use action inputs `license` and `files`:
+To customize files pattern use `files`:
 
 ```yaml
 - uses: g4s8/xcop-action@master
   with:
-    license: MY_LICENSE.txt
     files: "src/*.xml"
 ```
 
@@ -144,8 +141,6 @@ You can integrate it with the help of
             <configuration>
               <target>
                 <apply executable="xcop" failonerror="true">
-                  <arg value="--license"/>
-                  <arg value="LICENSE.txt"/>
                   <fileset dir=".">
                     <include name="**/*.xml"/>
                     <include name="**/*.xsd"/>
@@ -175,8 +170,6 @@ Something like this should work:
   [...]
   <target name="xcop">
     <apply executable="xcop" failonerror="true">
-      <arg value="--license"/>
-      <arg value="LICENSE.txt"/>
       <fileset dir=".">
         <include name="**/*.xml"/>
         <include name="**/*.xsd"/>

@@ -35,7 +35,6 @@ class TestRakeTask < Minitest::Test
       File.write(f, "<?xml version=\"1.0\"?>\n<x/>\n")
       Xcop::RakeTask.new(:xcop1) do |task|
         task.quiet = true
-        # task.license = 'LICENSE.txt'
       end
       Rake::Task['xcop1'].invoke
       File.delete(f)

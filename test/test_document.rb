@@ -47,64 +47,12 @@ class TestXcop < Minitest::Test
     end
   end
 
-  def test_license_presence
-    Dir.mktmpdir 'test2' do |dir|
-      f = File.join(dir, 'a.xml')
-      license = " Copyright (c) All Good People\n Don't touch it!\n\n"
-      File.write(
-        f,
-        [
-          '<?xml version="1.0"?>',
-          '<!--',
-          ' Copyright (c) All Good People',
-          ' Don\'t touch it!',
-          '-->',
-          '<hello>Dude!</hello>',
-          ''
-        ].join("\n")
-      )
-      assert_equal(Xcop::Document.new(f).ldiff(license), '')
-      File.delete(f)
-    end
-  end
-
-  def test_license_absence
-    Dir.mktmpdir 'test3' do |dir|
-      f = File.join(dir, 'a.xml')
-      license = "Copyright (c) All Good People\nTouch me!\n\n"
-      File.write(
-        f,
-        [
-          '<?xml version="1.0"?>',
-          '<hello>My dear friend!</hello>',
-          ''
-        ].join("\n")
-      )
-      assert(Xcop::Document.new(f).ldiff(license) != '')
-      File.delete(f)
-    end
-  end
-
   def test_fixes_document
     Dir.mktmpdir 'test3' do |dir|
       f = File.join(dir, 'bad.xml')
-      license = " Copyright (c) Me, Myself, and I\n   Like it?\n\n"
       File.write(f, '<hello>My friend!</hello>')
-      Xcop::Document.new(f).fix(license)
+      Xcop::Document.new(f).fix
       assert_equal(Xcop::Document.new(f).diff, '')
-      assert_equal(Xcop::Document.new(f).ldiff(license), '')
-      File.delete(f)
-    end
-  end
-
-  def test_removes_previous_license
-    Dir.mktmpdir 'test4' do |dir|
-      f = File.join(dir, 'bad.xml')
-      license = "the license to add\n\n\nhey"
-      File.write(f, '<hello>how do you do?</hello>')
-      Xcop::Document.new(f).fix(license)
-      Xcop::Document.new(f).fix(license)
-      assert_equal(Nokogiri::XML(File.read(f)).xpath('/comment()').length, 1)
       File.delete(f)
     end
   end

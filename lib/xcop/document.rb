@@ -42,24 +42,9 @@ class Xcop::Document
     differ(ideal, now, nocolor: nocolor)
   end
 
-  # Return the difference for the license.
-  def ldiff(license)
-    xml = Nokogiri::XML(File.open(@path), &:noblanks)
-    comment = xml.xpath('/comment()')[0]
-    now = comment.nil? ? '' : comment.text.to_s.strip
-    ideal = license.strip
-    differ(ideal, now)
-  end
-
   # Fixes the document.
-  def fix(license = '')
+  def fix
     xml = Nokogiri::XML(File.open(@path), &:noblanks)
-    unless license.empty?
-      xml.xpath('/comment()').remove
-      xml.children.before(
-        Nokogiri::XML::Comment.new(xml, "\n#{license.strip}\n")
-      )
-    end
     ideal = xml.to_xml(indent: 2)
     File.write(@path, ideal)
   end

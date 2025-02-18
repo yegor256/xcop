@@ -27,14 +27,13 @@ require_relative '../xcop/cli'
 # Copyright:: Copyright (c) 2017-2025 Yegor Bugayenko
 # License:: MIT
 class Xcop::RakeTask < Rake::TaskLib
-  attr_accessor :name, :fail_on_error, :excludes, :includes, :license, :quiet
+  attr_accessor :name, :fail_on_error, :excludes, :includes, :quiet
 
   def initialize(*args, &task_block)
     super()
     @name = args.shift || :xcop
     @includes = %w[xml xsd xhtml xsl html].map { |e| "**/*.#{e}" }
     @excludes = []
-    @license = nil
     @quiet = false
     desc 'Run Xcop' unless ::Rake.application.last_description
     task(name, *args) do |_, task_args|
@@ -53,7 +52,7 @@ class Xcop::RakeTask < Rake::TaskLib
     good = Dir.glob(@includes).reject { |f| bad.include?(f) }
     puts "Inspecting #{pluralize(good.length, 'file')}..." unless @quiet
     begin
-      Xcop::CLI.new(good, @license.nil? ? '' : File.read(@license)).run do
+      Xcop::CLI.new(good).run do
         print Rainbow('.').green unless @quiet
       end
     rescue StandardError => e
