@@ -1,3 +1,7 @@
+# (The MIT License)
+# 
+# SPDX-FileCopyrightText: Copyright (c) 2017-2025 Yegor Bugayenko
+# SPDX-License-Identifier: MIT
 Feature: Command Line Processing
   As an author of XML I want to be able to
   call XCOP as a command line tool
