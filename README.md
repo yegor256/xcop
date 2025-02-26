@@ -10,7 +10,6 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/yegor256/xcop/blob/master/LICENSE.txt)
 [![Maintainability](https://api.codeclimate.com/v1/badges/396ec0584e0a84adc723/maintainability)](https://codeclimate.com/github/yegor256/xcop/maintainability)
 [![Test Coverage](https://img.shields.io/codecov/c/github/yegor256/xcop.svg)](https://codecov.io/github/yegor256/xcop?branch=master)
-![Lines of code](https://img.shields.io/tokei/lines/github/yegor256/xcop)
 [![Hits-of-Code](https://hitsofcode.com/github/yegor256/xcop)](https://hitsofcode.com/view/github/yegor256/xcop)
 
 This command line tool validates your XML files for proper formatting.
