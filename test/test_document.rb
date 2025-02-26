@@ -16,7 +16,7 @@ class TestXcop < Minitest::Test
     Dir.mktmpdir 'test1' do |dir|
       f = File.join(dir, 'a.xml')
       File.write(f, "<?xml version=\"1.0\"?>\n<hello>Dude!</hello>\n")
-      assert_equal(Xcop::Document.new(f).diff, '')
+      assert_equal('', Xcop::Document.new(f).diff)
       File.delete(f)
     end
   end
@@ -25,7 +25,7 @@ class TestXcop < Minitest::Test
     Dir.mktmpdir 'test9' do |dir|
       f = File.join(dir, 'no-eol.xml')
       File.write(f, "<?xml version=\"1.0\"?>\n<x/>")
-      assert(Xcop::Document.new(f).diff != '')
+      refute_equal(Xcop::Document.new(f).diff, '')
       File.delete(f)
     end
   end
@@ -35,7 +35,7 @@ class TestXcop < Minitest::Test
       f = File.join(dir, 'bad.xml')
       File.write(f, '<hello>My friend!</hello>')
       Xcop::Document.new(f).fix
-      assert_equal(Xcop::Document.new(f).diff, '')
+      assert_equal('', Xcop::Document.new(f).diff)
       File.delete(f)
     end
   end
