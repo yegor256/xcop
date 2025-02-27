@@ -29,3 +29,4 @@ plugins:
   - rubocop-minitest
   - rubocop-performance
   - rubocop-rake
+require: []
