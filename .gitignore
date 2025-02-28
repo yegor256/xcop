@@ -1,8 +1,8 @@
-coverage/
-Gemfile.lock
-.idea/
 *.gem
-.bundle/
 .DS_Store
+.bundle/
+.idea/
+Gemfile.lock
+coverage/
 rdoc/
 vendor/
