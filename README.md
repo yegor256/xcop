@@ -14,9 +14,9 @@
 
 This command line tool validates your XML files for proper formatting.
 If they are not formatted correctly, it prints the difference and
-exits with an error. You can use it two ways: 1) to fail your build
+exits with an error. You can use it in two ways: 1) to fail your build
 if any XML-ish files (for example, XML, XSD, XSL, or XHTML) are not formatted correctly,
-and 2) to format them correctly using `--fix` option.
+and 2) to format them correctly using the `--fix` option.
 
 Read this blog post first:
 [_XCOP—XML Style Checker_](https://www.yegor256.com/2017/08/29/xcop.html).
@@ -42,14 +42,14 @@ $ xcop file1.xml file2.xml
 ```
 
 If your files are not formatted correctly and `xcop` complains, you
-can ask it to "beautify" them, using `--fix` option:
+can ask it to "beautify" them using the `--fix` option:
 
 ```bash
 $ xcop --fix broken-file.xml
 ```
 
-To fix all files in the directory you can do
-([won't work](https://askubuntu.com/questions/343727/) if your file names contain spaces):
+To fix all files in a directory, you can do the following
+([this won't work](https://askubuntu.com/questions/343727/) if your file names contain spaces):
 
 ```bash
 $ xcop --fix $(find . -name '*.xml')
@@ -57,10 +57,10 @@ $ xcop --fix $(find . -name '*.xml')
 
 ## Defaults
 
-You can put command line options into `.xcop` file in the directory
+You can put command line options into a `.xcop` file in the directory
 where you start `xcop`. Each option should take a single line in the file.
-They all will be _added_ to the list of options you specify. For example,
-as it was suggested in [this blog post](https://www.yegor256.com/2022/07/20/command-line-defaults.html):
+They will all be _added_ to the list of options you specify. For example,
+as suggested in [this blog post](https://www.yegor256.com/2022/07/20/command-line-defaults.html):
 
 ```
 --nocolor
@@ -89,7 +89,7 @@ end
 
 ## How to use as GitHub action?
 
-Create new workflow file in repository under `.github/workflows/xcop.yml`:
+Create a new workflow file in your repository under `.github/workflows/xcop.yml`:
 
 ```yaml
 ---
@@ -111,7 +111,7 @@ jobs:
       - uses: g4s8/xcop-action@master
 ```
 
-To customize files pattern use `files`:
+To customize the files pattern, use the `files` parameter:
 
 ```yaml
 - uses: g4s8/xcop-action@master

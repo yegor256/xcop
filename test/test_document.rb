@@ -25,7 +25,7 @@ class TestXcop < Minitest::Test
     Dir.mktmpdir 'test9' do |dir|
       f = File.join(dir, 'no-eol.xml')
       File.write(f, "<?xml version=\"1.0\"?>\n<x/>")
-      refute_equal(Xcop::Document.new(f).diff, '')
+      refute_empty(Xcop::Document.new(f).diff)
       File.delete(f)
     end
   end
