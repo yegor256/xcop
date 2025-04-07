@@ -1,12 +1,12 @@
 <img alt="XCOP logo" src="/logo.svg" width="64px"/>
 
 [![EO principles respected here](https://www.elegantobjects.org/badge.svg)](https://www.elegantobjects.org)
-[![DevOps By Rultor.com](http://www.rultor.com/b/yegor256/xcop)](http://www.rultor.com/p/yegor256/xcop)
+[![DevOps By Rultor.com](https://www.rultor.com/b/yegor256/xcop)](https://www.rultor.com/p/yegor256/xcop)
 [![We recommend RubyMine](https://www.elegantobjects.org/rubymine.svg)](https://www.jetbrains.com/ruby/)
 
 [![rake](https://github.com/yegor256/xcop/actions/workflows/rake.yml/badge.svg)](https://github.com/yegor256/xcop/actions/workflows/rake.yml)
-[![PDD status](http://www.0pdd.com/svg?name=yegor256/xcop)](http://www.0pdd.com/p?name=yegor256/xcop)
-[![Gem Version](https://badge.fury.io/rb/xcop.svg)](http://badge.fury.io/rb/xcop)
+[![PDD status](https://www.0pdd.com/svg?name=yegor256/xcop)](https://www.0pdd.com/p?name=yegor256/xcop)
+[![Gem Version](https://badge.fury.io/rb/xcop.svg)](https://badge.fury.io/rb/xcop)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/yegor256/xcop/blob/master/LICENSE.txt)
 [![Maintainability](https://api.codeclimate.com/v1/badges/396ec0584e0a84adc723/maintainability)](https://codeclimate.com/github/yegor256/xcop/maintainability)
 [![Test Coverage](https://img.shields.io/codecov/c/github/yegor256/xcop.svg)](https://codecov.io/github/yegor256/xcop?branch=master)
