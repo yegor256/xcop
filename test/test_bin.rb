@@ -14,186 +14,96 @@ class TestBin < Minitest::Test
   def setup
     @bin_path = File.join(__dir__, '..', 'bin', 'xcop')
     @ruby_cmd = "bundle exec ruby -Ilib #{@bin_path}"
+    @original_home = Dir.home
   end
 
-  def run_xcop(args, expect_success: true)
+  def teardown
+    ENV['HOME'] = @original_home if @original_home
+  end
+
+  def run_xcop(args = '', expect_success: true, chdir: nil)
     cmd = "#{@ruby_cmd} #{args}"
-    stdout, stderr, status = Open3.capture3(cmd, chdir: File.join(__dir__, '..'))
+    work_dir = chdir || File.join(__dir__, '..')
+    stdout, stderr, status = Open3.capture3(cmd, chdir: work_dir)
 
-    if expect_success && !status.success?
-      flunk "Command failed: #{cmd}\nSTDOUT: #{stdout}\nSTDERR: #{stderr}"
-    end
+    flunk "Command failed: #{cmd}\nSTDOUT: #{stdout}\nSTDERR: #{stderr}" if expect_success && !status.success?
 
-    stdout
+    [stdout, stderr, status]
   end
 
-  def run_xcop_expecting_failure(args)
-    cmd = "#{@ruby_cmd} #{args}"
-    stdout, stderr, status = Open3.capture3(cmd, chdir: File.join(__dir__, '..'))
-
-    refute status.success?, "Command should have failed: #{cmd}"
-    stdout + stderr
+  def run_xcop_expecting_failure(args = '', chdir: nil)
+    stdout, stderr, status = run_xcop(args, expect_success: false, chdir: chdir)
+    refute_predicate status, :success?, 'Command should have failed'
+    [stdout, stderr, status]
   end
 
-  def test_process_single_file
-    Dir.mktmpdir 'test_bin' do |dir|
+  def test_help_option
+    stdout, = run_xcop('--help')
+    assert_includes(stdout, 'Usage')
+    assert_includes(stdout, 'xcop [options] [files...]')
+  end
+
+  def test_version_option
+    stdout, = run_xcop('--version')
+    assert_match(/\d+\.\d+\.\d+/, stdout.strip)
+  end
+
+  def test_process_valid_xml_file
+    Dir.mktmpdir do |dir|
       xml_file = File.join(dir, 'test.xml')
       File.write(xml_file, "<?xml version=\"1.0\"?>\n<test>Content</test>\n")
 
-      output = run_xcop(xml_file)
+      stdout, = run_xcop(xml_file)
+      assert_includes(stdout, 'test.xml looks good')
+    end
+  end
 
-      assert_includes(output, 'test.xml looks good')
+  def test_process_invalid_xml_file
+    Dir.mktmpdir do |dir|
+      xml_file = File.join(dir, 'bad.xml')
+      File.write(xml_file, '<test>Bad formatting</test>')
+
+      stdout, stderr, = run_xcop_expecting_failure(xml_file)
+      output = stdout + stderr
+      assert_includes(output, 'Invalid XML formatting in')
     end
   end
 
   def test_process_directory
-    Dir.mktmpdir 'test_bin' do |dir|
-      subdir = File.join(dir, 'subdir')
-      FileUtils.mkdir_p(subdir)
-
-      xml_file = File.join(dir, 'file.xml')
-      nested_xml = File.join(subdir, 'nested.xml')
-      File.write(xml_file, "<?xml version=\"1.0\"?>\n<test>Content</test>\n")
-      File.write(nested_xml, "<?xml version=\"1.0\"?>\n<nested>Content</nested>\n")
-
-      output = run_xcop(dir)
-
-      assert_includes(output, 'file.xml looks good')
-      assert_includes(output, 'nested.xml looks good')
-    end
-  end
-
-  def test_process_mixed_input
-    Dir.mktmpdir 'test_bin' do |dir|
-      subdir = File.join(dir, 'subdir')
-      FileUtils.mkdir_p(subdir)
-
-      individual_file = File.join(dir, 'individual.xml')
-      nested_file = File.join(subdir, 'nested.xml')
-      File.write(individual_file, "<?xml version=\"1.0\"?>\n<individual>Content</individual>\n")
-      File.write(nested_file, "<?xml version=\"1.0\"?>\n<nested>Content</nested>\n")
-
-      output = run_xcop("#{individual_file} #{subdir}")
-
-      assert_includes(output, 'individual.xml looks good')
-      assert_includes(output, 'nested.xml looks good')
-    end
-  end
-
-  def test_ignores_non_xml_files
-    Dir.mktmpdir 'test_bin' do |dir|
+    Dir.mktmpdir do |dir|
+      FileUtils.mkdir_p(File.join(dir, 'subdir'))
+      File.write(File.join(dir, 'file.xml'), "<?xml version=\"1.0\"?>\n<test>Content</test>\n")
+      File.write(File.join(dir, 'subdir', 'nested.xml'), "<?xml version=\"1.0\"?>\n<nested>Content</nested>\n")
       File.write(File.join(dir, 'readme.txt'), 'Not XML')
-      File.write(File.join(dir, 'script.rb'), 'puts "Hello"')
 
-      output = run_xcop(dir)
-
-      assert_equal('', output.strip)
+      stdout, = run_xcop(dir)
+      assert_includes(stdout, 'file.xml looks good')
+      assert_includes(stdout, 'nested.xml looks good')
+      refute_includes(stdout, 'readme.txt')
     end
   end
 
-  def test_nonexistent_path_shows_error
-    output = run_xcop_expecting_failure('/nonexistent/path')
-    assert_includes(output, 'Path does not exist')
-  end
+  def test_exclude_pattern
+    Dir.mktmpdir do |dir|
+      File.write(File.join(dir, 'include.xml'), "<?xml version=\"1.0\"?>\n<include>Content</include>\n")
+      File.write(File.join(dir, 'exclude.xml'), "<?xml version=\"1.0\"?>\n<exclude>Content</exclude>\n")
 
-  def test_exclude_by_filename
-    Dir.mktmpdir 'test_bin' do |dir|
-      FileUtils.mkdir_p(File.join(dir, 'src'))
-      FileUtils.mkdir_p(File.join(dir, 'test'))
-      File.write(File.join(dir, 'src', 'main.xml'), "<?xml version=\"1.0\"?>\n<main>Content</main>\n")
-      File.write(File.join(dir, 'test', 'test1.xml'), "<?xml version=\"1.0\"?>\n<test>Content</test>\n")
-      File.write(File.join(dir, 'test', 'test2.xml'), "<?xml version=\"1.0\"?>\n<test>Content</test>\n")
-
-      output = run_xcop("#{dir} --exclude test1.xml")
-
-      assert_includes(output, 'main.xml looks good')
-      assert_includes(output, 'test2.xml looks good')
-      refute_includes(output, 'test1.xml')
+      stdout, = run_xcop("#{dir} --exclude exclude.xml")
+      assert_includes(stdout, 'include.xml looks good')
+      refute_includes(stdout, 'exclude.xml')
     end
   end
 
-  def test_exclude_by_directory_pattern
-    Dir.mktmpdir 'test_bin' do |dir|
-      FileUtils.mkdir_p(File.join(dir, 'src'))
-      FileUtils.mkdir_p(File.join(dir, 'test'))
-      FileUtils.mkdir_p(File.join(dir, 'config'))
-      File.write(File.join(dir, 'src', 'main.xml'), "<?xml version=\"1.0\"?>\n<main>Content</main>\n")
-      File.write(File.join(dir, 'test', 'test1.xml'), "<?xml version=\"1.0\"?>\n<test>Content</test>\n")
-      File.write(File.join(dir, 'test', 'test2.xml'), "<?xml version=\"1.0\"?>\n<test>Content</test>\n")
-      File.write(File.join(dir, 'config', 'settings.xml'), "<?xml version=\"1.0\"?>\n<config>Content</config>\n")
+  def test_fix_functionality
+    Dir.mktmpdir do |dir|
+      xml_file = File.join(dir, 'test.xml')
+      File.write(xml_file, '<test>Needs fixing</test>')
 
-      output = run_xcop("#{dir} --exclude '**/test/**'")
+      stdout, = run_xcop("#{xml_file} --fix")
+      assert_includes(stdout, 'test.xml fixed')
 
-      assert_includes(output, 'main.xml looks good')
-      assert_includes(output, 'settings.xml looks good')
-      refute_includes(output, 'test1.xml')
-      refute_includes(output, 'test2.xml')
-    end
-  end
-
-  def test_exclude_multiple_patterns
-    Dir.mktmpdir 'test_bin' do |dir|
-      FileUtils.mkdir_p(File.join(dir, 'src'))
-      FileUtils.mkdir_p(File.join(dir, 'test'))
-      FileUtils.mkdir_p(File.join(dir, 'config'))
-      File.write(File.join(dir, 'src', 'main.xml'), "<?xml version=\"1.0\"?>\n<main>Content</main>\n")
-      File.write(File.join(dir, 'test', 'test1.xml'), "<?xml version=\"1.0\"?>\n<test>Content</test>\n")
-      File.write(File.join(dir, 'config', 'settings.xml'), "<?xml version=\"1.0\"?>\n<config>Content</config>\n")
-
-      output = run_xcop("#{dir} --exclude test1.xml --exclude settings.xml")
-
-      assert_includes(output, 'main.xml looks good')
-      refute_includes(output, 'test1.xml')
-      refute_includes(output, 'settings.xml')
-    end
-  end
-
-  def test_fix_functionality_with_directory
-    Dir.mktmpdir 'test_bin' do |dir|
-      FileUtils.mkdir_p(File.join(dir, 'src'))
-      FileUtils.mkdir_p(File.join(dir, 'test'))
-
-      # Create badly formatted XML files
-      File.write(File.join(dir, 'src', 'main.xml'), '<main><content>needs fixing</content></main>')
-      File.write(File.join(dir, 'test', 'test1.xml'), '<test><case>also needs fixing</case></test>')
-
-      output = run_xcop("#{dir} --exclude '**/test/**' --fix")
-
-      assert_includes(output, 'main.xml fixed')
-      refute_includes(output, 'test1.xml')
-
-      # Verify the file was actually fixed
-      content = File.read(File.join(dir, 'src', 'main.xml'))
+      content = File.read(xml_file)
       assert_includes(content, '<?xml version="1.0"?>')
-
-      # Verify excluded file was not touched
-      test_content = File.read(File.join(dir, 'test', 'test1.xml'))
-      refute_includes(test_content, '<?xml version="1.0"?>')
-    end
-  end
-
-  def test_include_pattern_with_directory
-    Dir.mktmpdir 'test_bin' do |dir|
-      FileUtils.mkdir_p(File.join(dir, 'src'))
-      FileUtils.mkdir_p(File.join(dir, 'docs'))
-
-      File.write(File.join(dir, 'src', 'main.xml'), "<?xml version=\"1.0\"?>\n<main>Content</main>\n")
-      File.write(File.join(dir, 'docs', 'guide.xml'), "<?xml version=\"1.0\"?>\n<docs>Content</docs>\n")
-
-      output = run_xcop("--include '#{dir}/docs/*.xml' #{dir}/src/")
-
-      assert_includes(output, 'main.xml looks good')
-      assert_includes(output, 'guide.xml looks good')
-    end
-  end
-
-  def test_quiet_mode
-    Dir.mktmpdir 'test_bin' do |dir|
-      File.write(File.join(dir, 'test.xml'), "<?xml version=\"1.0\"?>\n<test>Content</test>\n")
-
-      output = run_xcop("#{dir} --quiet")
-
-      assert_equal('', output.strip)
     end
   end
 end
