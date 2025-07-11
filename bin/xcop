@@ -84,11 +84,7 @@ if opts[:include]
 end
 
 files += opts.arguments.map { |f| File.expand_path(f) }
-
-# Expand directories to XML files
 files = expand_directories_to_xml_files(files.to_a)
-
-# Apply exclude patterns
 exclude_patterns = opts[:exclude] || []
 files = apply_exclude_patterns(files, exclude_patterns)
 
