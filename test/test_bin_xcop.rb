@@ -222,22 +222,22 @@ class TestBinXcop < Minitest::Test
 
   def test_file_permissions
     with_xml_file('readonly.xml', VALID_XML) do |file|
-      File.chmod(0444, file)
+      File.chmod(0o444, file)
       assert_looks_good(file)
     ensure
-      File.chmod(0644, file) if File.exist?(file)
+      File.chmod(0o644, file) if File.exist?(file)
     end
   end
 
   def test_fix_readonly_file_fails_gracefully
     with_xml_file('readonly.xml', INVALID_XML) do |file|
-      File.chmod(0444, file)
+      File.chmod(0o444, file)
       stdout, stderr, status = run_xcop('--fix', file)
       assert_empty(stdout)
       assert_includes(stderr, 'Permission denied')
       assert_equal(1, status.exitstatus)
     ensure
-      File.chmod(0644, file) if File.exist?(file)
+      File.chmod(0o644, file) if File.exist?(file)
     end
   end
 
@@ -247,7 +247,7 @@ class TestBinXcop < Minitest::Test
   end
 
   def test_no_arguments
-    assert_quiet_run()
+    assert_quiet_run
   end
 
   private
@@ -256,8 +256,8 @@ class TestBinXcop < Minitest::Test
     File.realpath(path)
   end
 
-  def with_temp_dir
-    Dir.mktmpdir { |dir| yield(dir) }
+  def with_temp_dir(&block)
+    Dir.mktmpdir(&block)
   end
 
   def with_xml_file(filename, content)
@@ -295,7 +295,7 @@ class TestBinXcop < Minitest::Test
   def build_large_xml(items_count)
     content = "<?xml version=\"1.0\"?>\n<root>\n"
     items_count.times { |i| content += "  <item id=\"#{i}\">data</item>\n" }
-    content + "</root>\n"
+    "#{content}</root>\n"
   end
 
   def run_xcop(*args)
