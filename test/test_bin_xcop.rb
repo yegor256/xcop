@@ -297,7 +297,17 @@ class TestBinXcop < Minitest::Test
   def run_xcop(*args)
     xcop_dir = File.join(__dir__, '..')
     xcop_path = File.join(xcop_dir, 'bin', 'xcop')
-    absolute_args = args.map { |arg| arg.start_with?('-') ? arg : File.absolute_path(arg) }
+    absolute_args = args.map do |arg|
+      if arg.start_with?('-')
+        arg
+      else
+        begin
+          File.absolute_path(arg)
+        rescue Errno::ENOENT
+          arg
+        end
+      end
+    end
     Open3.capture3('bundle', 'exec', 'ruby', xcop_path, *absolute_args, chdir: xcop_dir)
   end
 
@@ -337,7 +347,7 @@ class TestBinXcop < Minitest::Test
   end
 
   def assert_success(*args)
-    stdout, stderr, status = run_xcop(*args)
+    _, stderr, status = run_xcop(*args)
     assert_empty(stderr)
     assert_equal(0, status.exitstatus)
   end
