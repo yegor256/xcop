@@ -1,4 +1,6 @@
-<img alt="XCOP logo" src="/logo.svg" width="64px"/>
+# XCOP
+
+![XCOP logo](/logo.svg)
 
 [![EO principles respected here](https://www.elegantobjects.org/badge.svg)](https://www.elegantobjects.org)
 [![DevOps By Rultor.com](https://www.rultor.com/b/yegor256/xcop)](https://www.rultor.com/p/yegor256/xcop)
@@ -25,34 +27,35 @@ Make sure you have [Ruby installed](https://www.ruby-lang.org/en/documentation/i
 and then install the tool:
 
 ```bash
-$ gem install xcop
+gem install xcop
 ```
 
 Run it locally and read its output:
 
 ```bash
-$ xcop --help
+xcop --help
 ```
 
 To validate formatting of your XML files just pass their names
 as arguments:
 
 ```bash
-$ xcop file1.xml file2.xml
+xcop file1.xml file2.xml
 ```
 
 If your files are not formatted correctly and `xcop` complains, you
 can ask it to "beautify" them using the `--fix` option:
 
 ```bash
-$ xcop --fix broken-file.xml
+xcop --fix broken-file.xml
 ```
 
 To fix all files in a directory, you can do the following
-([this won't work](https://askubuntu.com/questions/343727/) if your file names contain spaces):
+([this won't work](https://askubuntu.com/questions/343727/) if your file
+names contain spaces):
 
 ```bash
-$ xcop --fix $(find . -name '*.xml')
+xcop --fix $(find . -name '*.xml')
 ```
 
 ## Defaults
@@ -62,7 +65,7 @@ where you start `xcop`. Each option should take a single line in the file.
 They will all be _added_ to the list of options you specify. For example,
 as suggested in [this blog post](https://www.yegor256.com/2022/07/20/command-line-defaults.html):
 
-```
+```text
 --nocolor
 --quiet
 --include=**/*
@@ -183,13 +186,13 @@ Something like this should work:
 ## How to contribute
 
 Read [these guidelines](https://www.yegor256.com/2014/04/15/github-guidelines.html).
-Make sure your build is green before you contribute
-your pull request. You will need to have [Ruby](https://www.ruby-lang.org/en/) 2.3+ and
+Make sure your build is green before you contribute your pull request.
+You will need to have [Ruby](https://www.ruby-lang.org/en/) 2.3+ and
 [Bundler](https://bundler.io/) installed. Then:
 
-```
-$ bundle update
-$ bundle exec rake
+```bash
+bundle update
+bundle exec rake
 ```
 
 If it's clean and you don't see any error messages, submit your pull request.
