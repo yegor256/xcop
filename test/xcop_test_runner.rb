@@ -21,8 +21,8 @@ class XcopTestRunner
     Dir.mktmpdir(&block)
   end
 
-  def with_xml_file(filename, content, &block)
-    with_temp_dir { |dir| block.call(create_xml_in_dir(dir, filename, content)) }
+  def with_xml_file(filename, content)
+    with_temp_dir { |dir| yield(create_xml_in_dir(dir, filename, content)) }
   end
 
   def create_xml_in_dir(dir, filename, content)
