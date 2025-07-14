@@ -130,7 +130,7 @@ class TestBinXcop < Minitest::Test
       wanted_file = create_xml_in_dir(dir, 'wanted.xml', VALID_XML)
       create_xml_in_dir(dir, 'unwanted.xml', VALID_XML)
       stdout, stderr, status = run_xcop('--include', wanted_file)
-      assert_equal("#{normalize_path(wanted_file)} looks good\n", stdout)
+      assert_equal("#{wanted_file} looks good\n", stdout)
       assert_empty(stderr)
       assert_equal(0, status.exitstatus)
     end
