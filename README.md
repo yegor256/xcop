@@ -1,6 +1,6 @@
 # XCOP
 
-![XCOP logo](/logo.svg)
+<img alt="XCOP logo" src="/logo.svg" width="64px"/>
 
 [![EO principles respected here](https://www.elegantobjects.org/badge.svg)](https://www.elegantobjects.org)
 [![DevOps By Rultor.com](https://www.rultor.com/b/yegor256/xcop)](https://www.rultor.com/p/yegor256/xcop)
