@@ -109,7 +109,7 @@ class TestBinXcop < Minitest::Test
       include_file = create_xml_in_dir(dir, 'include.xml', VALID_XML)
       create_xml_in_dir(dir, 'exclude.xml', VALID_XML)
       stdout, stderr, status = run_xcop_in_dir(dir, '--exclude', 'exclude.xml', '.')
-      assert_equal("#{include_file} looks good\n", stdout)
+      assert_equal("#{normalize_path(include_file)} looks good\n", stdout)
       assert_empty(stderr)
       assert_equal(0, status.exitstatus)
     end
@@ -119,7 +119,7 @@ class TestBinXcop < Minitest::Test
     with_temp_dir do |dir|
       include_file = create_xml_in_dir(dir, 'include.xml', VALID_XML)
       stdout, stderr, status = run_xcop_in_dir(dir, '--exclude', 'nonexistent.xml', '.')
-      assert_equal("#{include_file} looks good\n", stdout)
+      assert_equal("#{normalize_path(include_file)} looks good\n", stdout)
       assert_empty(stderr)
       assert_equal(0, status.exitstatus)
     end
@@ -130,7 +130,7 @@ class TestBinXcop < Minitest::Test
       wanted_file = create_xml_in_dir(dir, 'wanted.xml', VALID_XML)
       create_xml_in_dir(dir, 'unwanted.xml', VALID_XML)
       stdout, stderr, status = run_xcop('--include', wanted_file)
-      assert_equal("#{wanted_file} looks good\n", stdout)
+      assert_equal("#{normalize_path(wanted_file)} looks good\n", stdout)
       assert_empty(stderr)
       assert_equal(0, status.exitstatus)
     end
@@ -149,7 +149,7 @@ class TestBinXcop < Minitest::Test
       create_xml_in_dir(dir, 'skip1.xml', VALID_XML)
       create_xml_in_dir(dir, 'skip2.xml', VALID_XML)
       stdout, stderr, status = run_xcop_in_dir(dir, '--exclude', 'skip1.xml', '--exclude', 'skip2.xml', '.')
-      assert_equal("#{keep_file} looks good\n", stdout)
+      assert_equal("#{normalize_path(keep_file)} looks good\n", stdout)
       assert_empty(stderr)
       assert_equal(0, status.exitstatus)
     end
@@ -160,7 +160,7 @@ class TestBinXcop < Minitest::Test
       test_file = create_xml_in_dir(dir, 'test.xml', VALID_XML)
       create_file_in_dir(dir, 'backup.xml.bak', '<root/>')
       stdout, stderr, status = run_xcop_in_dir(dir, '--exclude', '*.bak', '.')
-      assert_equal("#{test_file} looks good\n", stdout)
+      assert_equal("#{normalize_path(test_file)} looks good\n", stdout)
       assert_empty(stderr)
       assert_equal(0, status.exitstatus)
     end
@@ -251,6 +251,10 @@ class TestBinXcop < Minitest::Test
   end
 
   private
+
+  def normalize_path(path)
+    File.realpath(path)
+  end
 
   def with_temp_dir
     Dir.mktmpdir { |dir| yield(dir) }
