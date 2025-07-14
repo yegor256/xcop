@@ -37,10 +37,8 @@ end
 
 def apply_exclude_patterns(files, exclude_patterns)
   return files if exclude_patterns.empty?
-
   files.reject do |file|
     exclude_patterns.any? do |pattern|
-      # Try multiple matching strategies
       File.fnmatch?(pattern, file, File::FNM_PATHNAME) ||
       File.fnmatch?(pattern, File.basename(file), File::FNM_PATHNAME) ||
       File.fnmatch?("**/" + pattern, file, File::FNM_PATHNAME)
