@@ -2,24 +2,24 @@
 # SPDX-License-Identifier: MIT
 
 require 'minitest/autorun'
-require_relative 'test__helpers'
+require_relative 'xcop_test_runner'
 
 # Test for xcop operation modes (quiet, fix, etc.).
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2017-2025 Yegor Bugayenko
 # License:: MIT
 class TestOperationModes < Minitest::Test
-  include TestHelpers
-
   def test_quiet_mode
-    with_xml_file('test.xml', VALID_XML) do |file|
-      assert_quiet_run('--quiet', file)
+    runner = XcopTestRunner.new(self)
+    runner.with_xml_file('test.xml', XcopTestRunner::VALID_XML) do |file|
+      runner.assert_quiet_run('--quiet', file)
     end
   end
 
   def test_quiet_with_errors
-    with_xml_file('bad.xml', INVALID_XML) do |file|
-      stdout, stderr, status = run_xcop('--quiet', file)
+    runner = XcopTestRunner.new(self)
+    runner.with_xml_file('bad.xml', XcopTestRunner::INVALID_XML) do |file|
+      stdout, stderr, status = runner.run_xcop('--quiet', file)
       assert_match(/Invalid XML formatting/, stdout)
       assert_empty(stderr)
       assert_equal(1, status.exitstatus)
@@ -27,43 +27,48 @@ class TestOperationModes < Minitest::Test
   end
 
   def test_fix_mode
-    with_xml_file('bad.xml', INVALID_XML) do |file|
+    runner = XcopTestRunner.new(self)
+    runner.with_xml_file('bad.xml', XcopTestRunner::INVALID_XML) do |file|
       original = File.read(file)
-      assert_fixed(file)
+      runner.assert_fixed(file)
       refute_equal(original, File.read(file))
       assert_includes(File.read(file), '<?xml version="1.0"?>')
     end
   end
 
   def test_fix_mode_preserves_valid_files
-    with_xml_file('good.xml', VALID_XML) do |file|
+    runner = XcopTestRunner.new(self)
+    runner.with_xml_file('good.xml', XcopTestRunner::VALID_XML) do |file|
       original = File.read(file)
-      assert_fixed(file)
+      runner.assert_fixed(file)
       assert_equal(original, File.read(file))
     end
   end
 
   def test_fix_quiet
-    with_xml_file('bad.xml', INVALID_XML) do |file|
+    runner = XcopTestRunner.new(self)
+    runner.with_xml_file('bad.xml', XcopTestRunner::INVALID_XML) do |file|
       original = File.read(file)
-      assert_quiet_run('--fix', '--quiet', file)
+      runner.assert_quiet_run('--fix', '--quiet', file)
       refute_equal(original, File.read(file))
     end
   end
 
   def test_file_permissions
-    with_xml_file('readonly.xml', VALID_XML) do |file|
+    runner = XcopTestRunner.new(self)
+    runner.with_xml_file('readonly.xml', XcopTestRunner::VALID_XML) do |file|
       File.chmod(0o444, file)
-      assert_looks_good(file)
+      runner.assert_looks_good(file)
     ensure
       File.chmod(0o644, file) if File.exist?(file)
     end
   end
 
   def test_fix_readonly_file_fails_gracefully
-    with_xml_file('readonly.xml', INVALID_XML) do |file|
+    runner = XcopTestRunner.new(self)
+    runner.with_xml_file('readonly.xml', XcopTestRunner::INVALID_XML) do |file|
       File.chmod(0o444, file)
-      stdout, stderr, status = run_xcop('--fix', file)
+      stdout, stderr, status = runner.run_xcop('--fix', file)
       assert_empty(stdout)
       assert_includes(stderr, 'Permission denied')
       assert_equal(1, status.exitstatus)
@@ -73,6 +78,7 @@ class TestOperationModes < Minitest::Test
   end
 
   def test_no_arguments
-    assert_quiet_run
+    runner = XcopTestRunner.new(self)
+    runner.assert_quiet_run
   end
 end

@@ -5,27 +5,24 @@ require 'tmpdir'
 require 'fileutils'
 require 'open3'
 
-# Shared test helpers for xcop tests.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2017-2025 Yegor Bugayenko
 # License:: MIT
-module TestHelpers
+class XcopTestRunner
   VALID_XML = "<?xml version=\"1.0\"?>\n<root>content</root>\n".freeze
   INVALID_XML = '<root>  content  </root>'.freeze
   MALFORMED_XML = '<unclosed>'.freeze
 
-  private
-
-  def normalize_path(path)
-    File.realpath(path)
+  def initialize(test_instance)
+    @test = test_instance
   end
 
   def with_temp_dir(&block)
     Dir.mktmpdir(&block)
   end
 
-  def with_xml_file(filename, content)
-    with_temp_dir { |dir| yield(create_xml_in_dir(dir, filename, content)) }
+  def with_xml_file(filename, content, &block)
+    with_temp_dir { |dir| block.call(create_xml_in_dir(dir, filename, content)) }
   end
 
   def create_xml_in_dir(dir, filename, content)
@@ -62,6 +59,10 @@ module TestHelpers
     "#{content}</root>\n"
   end
 
+  def normalize_path(path)
+    File.realpath(path)
+  end
+
   def run_xcop(*args)
     xcop_dir = File.join(__dir__, '..')
     xcop_path = File.join(xcop_dir, 'bin', 'xcop')
@@ -88,29 +89,29 @@ module TestHelpers
 
   def assert_looks_good(file)
     stdout, stderr, status = run_xcop(file)
-    assert_equal("#{file} looks good\n", stdout)
-    assert_empty(stderr)
-    assert_equal(0, status.exitstatus)
+    @test.assert_equal("#{file} looks good\n", stdout)
+    @test.assert_empty(stderr)
+    @test.assert_equal(0, status.exitstatus)
   end
 
   def assert_invalid_xml(file, pattern)
     stdout, stderr, status = run_xcop(file)
-    assert_match(pattern, stdout)
-    assert_empty(stderr)
-    assert_equal(1, status.exitstatus)
+    @test.assert_match(pattern, stdout)
+    @test.assert_empty(stderr)
+    @test.assert_equal(1, status.exitstatus)
   end
 
   def assert_fixed(file)
     stdout, stderr, status = run_xcop('--fix', file)
-    assert_equal("#{file} fixed\n", stdout)
-    assert_empty(stderr)
-    assert_equal(0, status.exitstatus)
+    @test.assert_equal("#{file} fixed\n", stdout)
+    @test.assert_empty(stderr)
+    @test.assert_equal(0, status.exitstatus)
   end
 
   def assert_quiet_run(*args)
     stdout, stderr, status = run_xcop(*args)
-    assert_empty(stdout)
-    assert_empty(stderr)
-    assert_equal(0, status.exitstatus)
+    @test.assert_empty(stdout)
+    @test.assert_empty(stderr)
+    @test.assert_equal(0, status.exitstatus)
   end
 end
