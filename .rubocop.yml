@@ -25,6 +25,8 @@ Layout/EmptyLineAfterGuardClause:
   Enabled: false
 Style/ClassAndModuleChildren:
   Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: false
 plugins:
   - rubocop-minitest
   - rubocop-performance
