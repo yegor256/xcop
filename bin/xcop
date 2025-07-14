@@ -25,7 +25,7 @@ def expand_directories_to_xml_files(paths)
   expanded = []
   paths.each do |path|
     if File.directory?(path)
-      expanded.concat(Dir.glob(File.join(path, '**', '*.xml')))
+      expanded.concat(Dir.glob(File.join(path, '**', '*.xml'), File::FNM_DOTMATCH))
     elsif File.file?(path)
       expanded << path
     else

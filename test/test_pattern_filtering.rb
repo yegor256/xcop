@@ -76,4 +76,40 @@ class TestPatternFiltering < Minitest::Test
       assert_equal(0, status.exitstatus)
     end
   end
+
+  def test_hidden_directory_processing
+    fixture = XcopTestFixture.new(self)
+    fixture.with_temp_dir do |dir|
+      fixture.create_xml_in_dir(dir, 'regular.xml', XcopTestFixture::VALID_XML)
+      fixture.create_xml_in_subdir(dir, '.venv', 'hidden.xml', XcopTestFixture::INVALID_XML)
+      stdout, _stderr, status = fixture.run_xcop_in_dir(dir, '.')
+      assert_match(/Invalid XML formatting/, stdout)
+      assert_equal(1, status.exitstatus)
+    end
+  end
+
+  def test_exclude_hidden_directory
+    fixture = XcopTestFixture.new(self)
+    fixture.with_temp_dir do |dir|
+      regular_file = fixture.create_xml_in_dir(dir, 'regular.xml', XcopTestFixture::VALID_XML)
+      fixture.create_xml_in_subdir(dir, '.venv', 'hidden.xml', XcopTestFixture::INVALID_XML)
+      stdout, stderr, status = fixture.run_xcop_in_dir(dir, '--exclude', '.venv/**/*', '.')
+      assert_equal("#{fixture.normalize_path(regular_file)} looks good\n", stdout)
+      assert_empty(stderr)
+      assert_equal(0, status.exitstatus)
+    end
+  end
+
+  def test_exclude_hidden_directory_with_config_file
+    fixture = XcopTestFixture.new(self)
+    fixture.with_temp_dir do |dir|
+      fixture.create_xml_in_dir(dir, 'regular.xml', XcopTestFixture::VALID_XML)
+      fixture.create_xml_in_subdir(dir, '.venv', 'hidden.xml', XcopTestFixture::INVALID_XML)
+      fixture.create_config_file(dir, "--exclude=.venv/**/*\n--quiet")
+      stdout, stderr, status = fixture.run_xcop_in_dir(dir, '.')
+      assert_empty(stdout)
+      assert_empty(stderr)
+      assert_equal(0, status.exitstatus)
+    end
+  end
 end
