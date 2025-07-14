@@ -3,10 +3,10 @@
 ---
 AllCops:
   Exclude:
-    - 'bin/**/*'
-    - 'assets/**/*'
+    - "bin/**/*"
+    - "assets/**/*"
   DisplayCopNames: true
-  TargetRubyVersion: 2.2
+  TargetRubyVersion: 2.7
   NewCops: enable
   SuggestExtensions: false
 Metrics/CyclomaticComplexity:

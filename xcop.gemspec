@@ -9,7 +9,7 @@ require_relative 'lib/xcop/version'
 
 Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new('>= 0') if s.respond_to? :required_rubygems_version=
-  s.required_ruby_version = '>= 2.2'
+  s.required_ruby_version = '>= 2.7'
   s.name = 'xcop'
   s.version = Xcop::VERSION
   s.license = 'MIT'
