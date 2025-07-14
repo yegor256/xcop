@@ -8,7 +8,7 @@ require 'open3'
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
 # Copyright:: Copyright (c) 2017-2025 Yegor Bugayenko
 # License:: MIT
-class XcopTestRunner
+class XcopTestFixture
   VALID_XML = "<?xml version=\"1.0\"?>\n<root>content</root>\n".freeze
   INVALID_XML = '<root>  content  </root>'.freeze
   MALFORMED_XML = '<unclosed>'.freeze
