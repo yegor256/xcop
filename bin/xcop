@@ -78,7 +78,6 @@ opts = Slop.parse(args, strict: true, help: true) do |o|
   o.bool '--version', 'Show current version'
   o.bool '--fix', 'Fix all files instead of reporting their problems'
   o.bool '--nocolor', 'Suppress colored output'
-  o.string '--license', 'This option is deprecated'
   o.array '--include', 'Glob pattern(s) to include'
   o.array '--exclude', 'Glob pattern(s) to exclude'
 end
