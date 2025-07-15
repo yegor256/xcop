@@ -48,6 +48,13 @@ def expand_directories(paths)
   result
 end
 
+def filter_supported_files(files)
+  supported_extensions = ['.xml', '.xsd', '.xsl', '.xhtml', '.html']
+  files.select do |file|
+    supported_extensions.any? { |ext| file.end_with?(ext) }
+  end
+end
+
 def exclude_files(files, exclude_patterns)
   return files if exclude_patterns.nil? || exclude_patterns.empty?
   files.reject do |file|
@@ -98,6 +105,7 @@ Encoding.default_internal = Encoding::UTF_8
 files = collect_user_input(opts.arguments)
 files = include_files(files, opts[:include])
 files = expand_directories(files)
+files = filter_supported_files(files)
 files = exclude_files(files.uniq, opts[:exclude])
 
 if opts.fix?
