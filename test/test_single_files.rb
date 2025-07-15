@@ -76,7 +76,7 @@ class TestSingleFiles < Minitest::Test
   def test_include_processes_file
     fixture = XcopTestFixture.new(self)
     fixture.with_xml_file('included.xml', XcopTestFixture::VALID_XML) do |file|
-      stdout, _, _ = fixture.run_xcop('--include', file)
+      stdout, = fixture.run_xcop('--include', file)
       assert_includes(stdout, "#{file} looks good")
     end
   end
@@ -86,7 +86,7 @@ class TestSingleFiles < Minitest::Test
     fixture.with_temp_dir do |dir|
       fixture.create_xml_in_dir(dir, 'keep.xml', XcopTestFixture::VALID_XML)
       fixture.create_xml_in_dir(dir, 'exclude.xml', XcopTestFixture::VALID_XML)
-      stdout, _, _ = fixture.run_xcop_in_dir(dir, '--exclude', 'exclude.xml', '.')
+      stdout, = fixture.run_xcop_in_dir(dir, '--exclude', 'exclude.xml', '.')
       refute_includes(stdout, 'exclude.xml')
     end
   end

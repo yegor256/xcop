@@ -13,7 +13,7 @@ class TestDirectories < Minitest::Test
       fixture.create_xml_in_dir(dir, 'transform.xsl', XcopTestFixture::VALID_XML)
       fixture.create_xml_in_dir(dir, 'page.xhtml', XcopTestFixture::VALID_XML)
       fixture.create_xml_in_dir(dir, 'page.html', XcopTestFixture::VALID_XML)
-      stdout, _, _ = fixture.run_xcop(dir)
+      stdout, = fixture.run_xcop(dir)
       assert_match(/doc\.xml looks good/, stdout)
       assert_match(/schema\.xsd looks good/, stdout)
       assert_match(/transform\.xsl looks good/, stdout)
@@ -29,7 +29,7 @@ class TestDirectories < Minitest::Test
       fixture.create_file_in_dir(dir, 'text.txt', 'plain text')
       fixture.create_file_in_dir(dir, 'code.rb', 'puts "hello"')
       fixture.create_file_in_dir(dir, 'data.json', '{}')
-      stdout, _, _ = fixture.run_xcop(dir)
+      stdout, = fixture.run_xcop(dir)
       refute_match(/text\.txt/, stdout)
       refute_match(/code\.rb/, stdout)
       refute_match(/data\.json/, stdout)
@@ -40,7 +40,7 @@ class TestDirectories < Minitest::Test
     fixture = XcopTestFixture.new(self)
     fixture.with_temp_dir do |dir|
       file_path = fixture.create_xml_in_dir(dir, 'included.xml', XcopTestFixture::VALID_XML)
-      stdout, _, _ = fixture.run_xcop('--include', file_path)
+      stdout, = fixture.run_xcop('--include', file_path)
       assert_match(/included\.xml looks good/, stdout)
     end
   end
@@ -50,7 +50,7 @@ class TestDirectories < Minitest::Test
     fixture.with_temp_dir do |dir|
       fixture.create_xml_in_dir(dir, 'keep.xml', XcopTestFixture::VALID_XML)
       fixture.create_xml_in_dir(dir, 'exclude.xml', XcopTestFixture::VALID_XML)
-      stdout, _, _ = fixture.run_xcop_in_dir(dir, '--exclude', 'exclude.xml', '.')
+      stdout, = fixture.run_xcop_in_dir(dir, '--exclude', 'exclude.xml', '.')
       refute_match(/exclude\.xml/, stdout)
     end
   end
@@ -60,7 +60,7 @@ class TestDirectories < Minitest::Test
     fixture.with_temp_dir do |dir|
       file_path = fixture.create_xml_in_dir(dir, 'fixable.xml', XcopTestFixture::INVALID_XML)
       original = File.read(file_path)
-      _, _, _ = fixture.run_xcop('--fix', dir)
+      fixture.run_xcop('--fix', dir)
       refute_equal(original, File.read(file_path))
     end
   end

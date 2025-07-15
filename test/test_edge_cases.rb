@@ -9,20 +9,20 @@ class TestEdgeCases < Minitest::Test
     fixture = XcopTestFixture.new(self)
     fixture.with_temp_dir do |dir|
       file = fixture.create_xml_in_dir(dir, 'test.xml', XcopTestFixture::VALID_XML)
-      stdout, _, _ = fixture.run_xcop('--include', file, '--exclude', file)
+      stdout, = fixture.run_xcop('--include', file, '--exclude', file)
       assert_empty(stdout)
     end
   end
 
   def test_nonexistent_file_causes_error
     fixture = XcopTestFixture.new(self)
-    _, stderr, _ = fixture.run_xcop('nonexistent.xml')
+    _, stderr, = fixture.run_xcop('nonexistent.xml')
     assert_includes(stderr, 'Path does not exist')
   end
 
   def test_nonexistent_directory_causes_error
     fixture = XcopTestFixture.new(self)
-    _, stderr, _ = fixture.run_xcop('nonexistent_directory')
+    _, stderr, = fixture.run_xcop('nonexistent_directory')
     assert_includes(stderr, 'Path does not exist')
   end
 
@@ -42,7 +42,7 @@ class TestEdgeCases < Minitest::Test
   def test_exclude_nonexistent_wildcard_ignores_pattern
     fixture = XcopTestFixture.new(self)
     fixture.with_xml_file('test.xml', XcopTestFixture::VALID_XML) do |file|
-      stdout, _, _ = fixture.run_xcop('--exclude', 'nonexistent_*', file)
+      stdout, = fixture.run_xcop('--exclude', 'nonexistent_*', file)
       assert_includes(stdout, "#{file} looks good")
     end
   end
@@ -60,9 +60,9 @@ class TestEdgeCases < Minitest::Test
     fixture.with_temp_dir do |dir|
       file1 = fixture.create_xml_in_dir(dir, 'keep.xml', XcopTestFixture::VALID_XML)
       file2 = fixture.create_xml_in_dir(dir, 'skip.xml', XcopTestFixture::VALID_XML)
-      stdout, _, _ = fixture.run_xcop('--include', file1, '--include', file2, '--exclude', file2)
+      stdout, = fixture.run_xcop('--include', file1, '--include', file2, '--exclude', file2)
       assert_includes(stdout, "#{file1} looks good")
-      refute_includes(stdout, "skip.xml")
+      refute_includes(stdout, 'skip.xml')
     end
   end
 
@@ -74,19 +74,19 @@ class TestEdgeCases < Minitest::Test
       FileUtils.mkdir_p(exclude_dir)
       fixture.create_xml_in_dir(exclude_dir, 'file1.xml', XcopTestFixture::VALID_XML)
       fixture.create_xml_in_dir(exclude_dir, 'file2.xml', XcopTestFixture::VALID_XML)
-      stdout, _, _ = fixture.run_xcop_in_dir(dir, '--exclude', 'exclude_dir', '.')
+      stdout, = fixture.run_xcop_in_dir(dir, '--exclude', 'exclude_dir', '.')
       refute_includes(stdout, 'file1.xml')
       refute_includes(stdout, 'file2.xml')
     end
   end
 
-  def test_nonexistent_file_error_exits_with_code_1
+  def test_nonexistent_file_error_exits_with_code1
     fixture = XcopTestFixture.new(self)
     _, _, status = fixture.run_xcop('nonexistent.xml')
     assert_equal(1, status.exitstatus)
   end
 
-  def test_nonexistent_directory_error_exits_with_code_1
+  def test_nonexistent_directory_error_exits_with_code1
     fixture = XcopTestFixture.new(self)
     _, _, status = fixture.run_xcop('nonexistent_directory')
     assert_equal(1, status.exitstatus)

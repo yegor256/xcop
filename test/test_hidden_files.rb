@@ -12,7 +12,7 @@ class TestHiddenFiles < Minitest::Test
       hidden_dir = File.join(dir, '.hidden')
       FileUtils.mkdir_p(hidden_dir)
       fixture.create_xml_in_dir(hidden_dir, 'hidden.xml', XcopTestFixture::INVALID_XML)
-      stdout, _, _ = fixture.run_xcop(dir)
+      stdout, = fixture.run_xcop(dir)
       assert_match(/Invalid XML formatting/, stdout)
     end
   end
@@ -21,7 +21,7 @@ class TestHiddenFiles < Minitest::Test
     fixture = XcopTestFixture.new(self)
     fixture.with_temp_dir do |dir|
       fixture.create_xml_in_dir(dir, '.hidden.xml', XcopTestFixture::INVALID_XML)
-      stdout, _, _ = fixture.run_xcop(dir)
+      stdout, = fixture.run_xcop(dir)
       assert_match(/Invalid XML formatting/, stdout)
     end
   end
@@ -32,7 +32,7 @@ class TestHiddenFiles < Minitest::Test
       deep_hidden_dir = File.join(dir, '.hidden1', '.hidden2')
       FileUtils.mkdir_p(deep_hidden_dir)
       fixture.create_xml_in_dir(deep_hidden_dir, 'nested.xml', XcopTestFixture::INVALID_XML)
-      stdout, _, _ = fixture.run_xcop(dir)
+      stdout, = fixture.run_xcop(dir)
       assert_match(/Invalid XML formatting/, stdout)
     end
   end
@@ -42,7 +42,7 @@ class TestHiddenFiles < Minitest::Test
     fixture.with_temp_dir do |dir|
       fixture.create_xml_in_dir(dir, 'regular.xml', XcopTestFixture::VALID_XML)
       fixture.create_xml_in_dir(dir, '.hidden.xml', XcopTestFixture::VALID_XML)
-      stdout, _, _ = fixture.run_xcop(dir)
+      stdout, = fixture.run_xcop(dir)
       assert_match(/regular\.xml looks good/, stdout)
       assert_match(/\.hidden\.xml looks good/, stdout)
     end
@@ -54,7 +54,7 @@ class TestHiddenFiles < Minitest::Test
       hidden_dir = File.join(dir, '.hidden_dir')
       FileUtils.mkdir_p(hidden_dir)
       fixture.create_xml_in_dir(hidden_dir, 'inside_hidden.xml', XcopTestFixture::VALID_XML)
-      stdout, _, _ = fixture.run_xcop(dir)
+      stdout, = fixture.run_xcop(dir)
       assert_match(/\.hidden_dir.*inside_hidden\.xml looks good/, stdout)
     end
   end
