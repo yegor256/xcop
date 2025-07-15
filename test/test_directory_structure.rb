@@ -91,4 +91,21 @@ class TestDirectoryStructureHandling < Minitest::Test
       assert_equal(1, status.exitstatus)
     end
   end
+
+  def test_xml_like_file_formats_support
+    fixture = XcopTestFixture.new(self)
+    fixture.with_temp_dir do |dir|
+      # Create files with different XML-like extensions
+      fixture.create_xml_in_dir(dir, 'document.xml', XcopTestFixture::VALID_XML)
+      fixture.create_xml_in_dir(dir, 'schema.xsd', XcopTestFixture::VALID_XML)
+      fixture.create_xml_in_dir(dir, 'transform.xsl', XcopTestFixture::VALID_XML)
+
+      # All XML-like files should be processed by default
+      stdout, _stderr, status = fixture.run_xcop_in_dir(dir, '.')
+      assert_match(/document\.xml looks good/, stdout)
+      assert_match(/schema\.xsd looks good/, stdout)
+      assert_match(/transform\.xsl looks good/, stdout)
+      assert_equal(0, status.exitstatus)
+    end
+  end
 end

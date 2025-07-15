@@ -9,7 +9,7 @@ require_relative 'xcop_test_fixture'
 # Copyright:: Copyright (c) 2017-2025 Yegor Bugayenko
 # License:: MIT
 class TestBasicPatternFiltering < Minitest::Test
-  def test_exclude_pattern
+  def test_exclude_existing_file
     fixture = XcopTestFixture.new(self)
     fixture.with_temp_dir do |dir|
       include_file = fixture.create_xml_in_dir(dir, 'include.xml', XcopTestFixture::VALID_XML)
@@ -21,12 +21,27 @@ class TestBasicPatternFiltering < Minitest::Test
     end
   end
 
-  def test_exclude_pattern_no_matches
+  def test_exclude_existing_directory
     fixture = XcopTestFixture.new(self)
     fixture.with_temp_dir do |dir|
-      include_file = fixture.create_xml_in_dir(dir, 'include.xml', XcopTestFixture::VALID_XML)
-      stdout, stderr, status = fixture.run_xcop_in_dir(dir, '--exclude', 'nonexistent.xml', '.')
-      assert_equal("#{fixture.normalize_path(include_file)} looks good\n", stdout)
+      keep_file = fixture.create_xml_in_dir(dir, 'keep.xml', XcopTestFixture::VALID_XML)
+      exclude_dir = File.join(dir, 'exclude_dir')
+      FileUtils.mkdir_p(exclude_dir)
+      fixture.create_xml_in_dir(exclude_dir, 'file1.xml', XcopTestFixture::VALID_XML)
+      stdout, stderr, status = fixture.run_xcop_in_dir(dir, '--exclude', 'exclude_dir', '.')
+      assert_equal("#{fixture.normalize_path(keep_file)} looks good\n", stdout)
+      assert_empty(stderr)
+      assert_equal(0, status.exitstatus)
+    end
+  end
+
+  def test_exclude_wildcard_pattern
+    fixture = XcopTestFixture.new(self)
+    fixture.with_temp_dir do |dir|
+      test_file = fixture.create_xml_in_dir(dir, 'test.xml', XcopTestFixture::VALID_XML)
+      fixture.create_xml_in_dir(dir, 'backup.xml.bak', XcopTestFixture::VALID_XML)
+      stdout, stderr, status = fixture.run_xcop_in_dir(dir, '--exclude', '*.bak', '.')
+      assert_equal("#{fixture.normalize_path(test_file)} looks good\n", stdout)
       assert_empty(stderr)
       assert_equal(0, status.exitstatus)
     end
@@ -60,18 +75,6 @@ class TestBasicPatternFiltering < Minitest::Test
       fixture.create_xml_in_dir(dir, 'skip2.xml', XcopTestFixture::VALID_XML)
       stdout, stderr, status = fixture.run_xcop_in_dir(dir, '--exclude', 'skip1.xml', '--exclude', 'skip2.xml', '.')
       assert_equal("#{fixture.normalize_path(keep_file)} looks good\n", stdout)
-      assert_empty(stderr)
-      assert_equal(0, status.exitstatus)
-    end
-  end
-
-  def test_wildcard_exclude
-    fixture = XcopTestFixture.new(self)
-    fixture.with_temp_dir do |dir|
-      test_file = fixture.create_xml_in_dir(dir, 'test.xml', XcopTestFixture::VALID_XML)
-      fixture.create_file_in_dir(dir, 'backup.xml.bak', '<root/>')
-      stdout, stderr, status = fixture.run_xcop_in_dir(dir, '--exclude', '*.bak', '.')
-      assert_equal("#{fixture.normalize_path(test_file)} looks good\n", stdout)
       assert_empty(stderr)
       assert_equal(0, status.exitstatus)
     end
