@@ -4,6 +4,7 @@
 
 STDOUT.sync = true
 XML_PATTERNS = ['**/*.xml', '**/*.xsd', '**/*.xsl', '**/*.xhtml', '**/*.html'].freeze
+XML_EXTENSIONS = ['.xml', '.xsd', '.xsl', '.xhtml', '.html'].freeze
 
 require 'slop'
 require 'nokogiri'
@@ -49,9 +50,8 @@ def expand_directories(paths)
 end
 
 def filter_supported_files(files)
-  supported_extensions = ['.xml', '.xsd', '.xsl', '.xhtml', '.html']
   files.select do |file|
-    supported_extensions.any? { |ext| file.end_with?(ext) }
+    XML_EXTENSIONS.any? { |ext| file.end_with?(ext) }
   end
 end
 
