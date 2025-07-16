@@ -27,9 +27,9 @@ def paths(arguments)
   arguments.map { |f| File.expand_path(f) }
 end
 
-def include_files(paths, to_include)
-  return if to_include.nil? || to_include.empty?
-  to_include.each { |glob| paths.concat(Dir.glob(glob, File::FNM_DOTMATCH).map { |f| File.expand_path(f) }) }
+def add(paths, patterns)
+  return if patterns.nil? || patterns.empty?
+  patterns.each { |glob| paths.concat(Dir.glob(glob, File::FNM_DOTMATCH).map { |f| File.expand_path(f) }) }
 end
 
 def expand(paths)
@@ -47,26 +47,26 @@ def expand(paths)
   end
 end
 
-def filter(files)
-  files.select! do |file|
-    XML_EXTENSIONS.any? { |ext| file.end_with?(ext) }
+def filter(paths)
+  paths.select! do |path|
+    XML_EXTENSIONS.any? { |ext| path.end_with?(ext) }
   end
 end
 
-def exclude(files, exclude_patterns)
-  return if exclude_patterns.nil? || exclude_patterns.empty?
-  files.reject! do |file|
-    exclude_patterns.any? do |pattern|
+def exclude(paths, patterns)
+  return if patterns.nil? || patterns.empty?
+  paths.reject! do |path|
+    patterns.any? do |pattern|
       if File.exist?(pattern)
         if File.directory?(pattern)
-          file.start_with?(File.expand_path(pattern))
+          path.start_with?(File.expand_path(pattern))
         else
-          File.expand_path(file) == File.expand_path(pattern)
+          File.expand_path(path) == File.expand_path(pattern)
         end
       else
-        File.fnmatch?(pattern, file, File::FNM_PATHNAME) ||
-        File.fnmatch?(pattern, File.basename(file), File::FNM_PATHNAME) ||
-        File.fnmatch?("**/#{pattern}", file, File::FNM_PATHNAME)
+        File.fnmatch?(pattern, path, File::FNM_PATHNAME) ||
+        File.fnmatch?(pattern, File.basename(path), File::FNM_PATHNAME) ||
+        File.fnmatch?("**/#{pattern}", path, File::FNM_PATHNAME)
       end
     end
   end
@@ -99,7 +99,7 @@ Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
 
 paths = paths(opts.arguments)
-include_files(paths, opts[:include])
+add(paths, opts[:include])
 expand(paths)
 filter(paths)
 paths.uniq!
