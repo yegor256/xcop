@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: MIT
 
 STDOUT.sync = true
+XML_PATTERNS = ['**/*.xml', '**/*.xsd', '**/*.xsl', '**/*.xhtml', '**/*.html'].freeze
+XML_EXTENSIONS = ['.xml', '.xsd', '.xsl', '.xhtml', '.html'].freeze
 
 require 'slop'
 require 'nokogiri'
@@ -21,6 +23,55 @@ def config(path)
   args
 end
 
+def paths(arguments)
+  arguments.map { |f| File.expand_path(f) }
+end
+
+def add(paths, patterns)
+  return if patterns.nil? || patterns.empty?
+  patterns.each { |glob| paths.concat(Dir.glob(glob, File::FNM_DOTMATCH).map { |f| File.expand_path(f) }) }
+end
+
+def expand(paths)
+  original_paths = paths.dup
+  paths.clear
+  original_paths.each do |path|
+    case
+    when File.directory?(path)
+      XML_PATTERNS.each { |pattern| paths.concat(Dir.glob(File.join(path, pattern), File::FNM_DOTMATCH)) }
+    when File.file?(path)
+      paths << path
+    else
+      raise "Path does not exist: #{path}"
+    end
+  end
+end
+
+def filter(paths)
+  paths.select! do |path|
+    XML_EXTENSIONS.any? { |ext| path.end_with?(ext) }
+  end
+end
+
+def exclude(paths, patterns)
+  return if patterns.nil? || patterns.empty?
+  paths.reject! do |path|
+    patterns.any? do |pattern|
+      if File.exist?(pattern)
+        if File.directory?(pattern)
+          path.start_with?(File.expand_path(pattern))
+        else
+          File.expand_path(path) == File.expand_path(pattern)
+        end
+      else
+        File.fnmatch?(pattern, path, File::FNM_PATHNAME) ||
+        File.fnmatch?(pattern, File.basename(path), File::FNM_PATHNAME) ||
+        File.fnmatch?("**/#{pattern}", path, File::FNM_PATHNAME)
+      end
+    end
+  end
+end
+
 args = config('~/.xcop') + config('.xcop') + ARGV
 
 opts = Slop.parse(args, strict: true, help: true) do |o|
@@ -30,7 +81,6 @@ opts = Slop.parse(args, strict: true, help: true) do |o|
   o.bool '--version', 'Show current version'
   o.bool '--fix', 'Fix all files instead of reporting their problems'
   o.bool '--nocolor', 'Suppress colored output'
-  o.string '--license', 'This option is deprecated'
   o.array '--include', 'Glob pattern(s) to include'
   o.array '--exclude', 'Glob pattern(s) to exclude'
 end
@@ -48,29 +98,20 @@ end
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
 
-files = Set.new
-
-if opts[:include]
-  opts[:include].each do |glob|
-    files += Dir.glob(glob).map { |f| File.expand_path(f) }
-  end
-end
-
-files += opts.arguments.map { |f| File.expand_path(f) }
-
-if opts[:exclude]
-  opts[:exclude].each do |glob|
-    files -= Dir.glob(glob).map { |f| File.expand_path(f) }
-  end
-end
+paths = paths(opts.arguments)
+add(paths, opts[:include])
+expand(paths)
+filter(paths)
+paths.uniq!
+exclude(paths, opts[:exclude])
 
 if opts.fix?
-  Xcop::CLI.new(files).fix do |f|
+  Xcop::CLI.new(paths).fix do |f|
     puts "#{f} fixed" unless opts.quiet?
   end
 else
   begin
-    Xcop::CLI.new(files, nocolor: opts.nocolor?).run do |f|
+    Xcop::CLI.new(paths, nocolor: opts.nocolor?).run do |f|
       puts "#{f} looks good" unless opts.quiet?
     end
   rescue StandardError => e
