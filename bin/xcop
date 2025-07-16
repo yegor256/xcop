@@ -23,56 +23,52 @@ def config(path)
   args
 end
 
-def collect_user_input(arguments)
+def paths(arguments)
   arguments.map { |f| File.expand_path(f) }
 end
 
 def include_files(paths, to_include)
-  result = paths.dup
-  return result if to_include.nil? || to_include.empty?
-  to_include.each { |glob| result.concat(Dir.glob(glob, File::FNM_DOTMATCH).map { |f| File.expand_path(f) }) }
-  result
+  return if to_include.nil? || to_include.empty?
+  to_include.each { |glob| paths.concat(Dir.glob(glob, File::FNM_DOTMATCH).map { |f| File.expand_path(f) }) }
 end
 
-def expand_directories(paths)
-  result = []
-  paths.each do |path|
+def expand(paths)
+  original_paths = paths.dup
+  paths.clear
+  original_paths.each do |path|
     case
     when File.directory?(path)
-      XML_PATTERNS.each { |pattern| result.concat(Dir.glob(File.join(path, pattern), File::FNM_DOTMATCH)) }
+      XML_PATTERNS.each { |pattern| paths.concat(Dir.glob(File.join(path, pattern), File::FNM_DOTMATCH)) }
     when File.file?(path)
-      result << path
+      paths << path
     else
       raise "Path does not exist: #{path}"
     end
   end
-  result
 end
 
-def filter_supported_files(files)
-  files.select do |file|
+def filter(files)
+  files.select! do |file|
     XML_EXTENSIONS.any? { |ext| file.end_with?(ext) }
   end
 end
 
-def exclude_files(files, exclude_patterns)
-  return files if exclude_patterns.nil? || exclude_patterns.empty?
-  files.reject do |file|
-    exclude_patterns.any? { |pattern| file_matches_exclude?(file, pattern) }
-  end
-end
-
-def file_matches_exclude?(file, pattern)
-  if File.exist?(pattern)
-    if File.directory?(pattern)
-      file.start_with?(File.expand_path(pattern))
-    else
-      File.expand_path(file) == File.expand_path(pattern)
+def exclude(files, exclude_patterns)
+  return if exclude_patterns.nil? || exclude_patterns.empty?
+  files.reject! do |file|
+    exclude_patterns.any? do |pattern|
+      if File.exist?(pattern)
+        if File.directory?(pattern)
+          file.start_with?(File.expand_path(pattern))
+        else
+          File.expand_path(file) == File.expand_path(pattern)
+        end
+      else
+        File.fnmatch?(pattern, file, File::FNM_PATHNAME) ||
+        File.fnmatch?(pattern, File.basename(file), File::FNM_PATHNAME) ||
+        File.fnmatch?("**/#{pattern}", file, File::FNM_PATHNAME)
+      end
     end
-  else
-    File.fnmatch?(pattern, file, File::FNM_PATHNAME) ||
-    File.fnmatch?(pattern, File.basename(file), File::FNM_PATHNAME) ||
-    File.fnmatch?("**/#{pattern}", file, File::FNM_PATHNAME)
   end
 end
 
@@ -102,19 +98,20 @@ end
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
 
-files = collect_user_input(opts.arguments)
-files = include_files(files, opts[:include])
-files = expand_directories(files)
-files = filter_supported_files(files)
-files = exclude_files(files.uniq, opts[:exclude])
+paths = paths(opts.arguments)
+include_files(paths, opts[:include])
+expand(paths)
+filter(paths)
+paths.uniq!
+exclude(paths, opts[:exclude])
 
 if opts.fix?
-  Xcop::CLI.new(files).fix do |f|
+  Xcop::CLI.new(paths).fix do |f|
     puts "#{f} fixed" unless opts.quiet?
   end
 else
   begin
-    Xcop::CLI.new(files, nocolor: opts.nocolor?).run do |f|
+    Xcop::CLI.new(paths, nocolor: opts.nocolor?).run do |f|
       puts "#{f} looks good" unless opts.quiet?
     end
   rescue StandardError => e
