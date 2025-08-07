@@ -8,6 +8,7 @@ if Gem.win_platform?
   SimpleCov.start do
     add_filter '/test/'
     add_filter '/features/'
+    add_filter '/assets/'
   end
 else
   SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
@@ -16,6 +17,7 @@ else
   SimpleCov.start do
     add_filter '/test/'
     add_filter '/features/'
+    add_filter '/assets/'
     minimum_coverage 80
   end
 end
