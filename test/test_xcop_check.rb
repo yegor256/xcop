@@ -32,6 +32,25 @@ class TestXcopCheck < Minitest::Test
     end
   end
 
+  def test_handles_nonexistent_file
+    nonexistent = '/tmp/nonexistent_file.xml'
+    assert_raises(Errno::ENOENT) do
+      cli = Xcop::CLI.new([nonexistent])
+      cli.run
+    end
+  end
+
+  def test_handles_empty_xml_file
+    Dir.mktmpdir 'test_empty' do |dir|
+      xml_file = File.join(dir, 'empty.xml')
+      File.write(xml_file, '')
+      assert_raises(RuntimeError) do
+        cli = Xcop::CLI.new([xml_file])
+        cli.run
+      end
+    end
+  end
+
   def test_processes_multiple_files
     Dir.mktmpdir 'test_multiple' do |dir|
       f1 = File.join(dir, 'file1.xml')
