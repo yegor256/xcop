@@ -26,28 +26,22 @@ class TestXcopCheck < Minitest::Test
       f = File.join(dir, 'invalid.xml')
       File.write(f, '<root><item>test</item></root>')
       cli = Xcop::CLI.new([f])
-      assert_raises(StandardError) do
-        cli.run
-      end
+      assert_raises(StandardError) { cli.run }
     end
   end
 
   def test_handles_nonexistent_file
     nonexistent = '/tmp/nonexistent_file.xml'
-    assert_raises(Errno::ENOENT) do
-      cli = Xcop::CLI.new([nonexistent])
-      cli.run
-    end
+    cli = Xcop::CLI.new([nonexistent])
+    assert_raises(Errno::ENOENT) { cli.run }
   end
 
   def test_handles_empty_xml_file
     Dir.mktmpdir 'test_empty' do |dir|
       xml_file = File.join(dir, 'empty.xml')
       File.write(xml_file, '')
-      assert_raises(RuntimeError) do
-        cli = Xcop::CLI.new([xml_file])
-        cli.run
-      end
+      cli = Xcop::CLI.new([xml_file])
+      assert_raises(RuntimeError) { cli.run }
     end
   end
 
@@ -71,9 +65,7 @@ class TestXcopCheck < Minitest::Test
       f = File.join(dir, 'bad_format.xml')
       File.write(f, '<?xml version="1.0"?><root><item>no proper indenting</item></root>')
       cli = Xcop::CLI.new([f])
-      error = assert_raises(RuntimeError) do
-        cli.run
-      end
+      error = assert_raises(RuntimeError) { cli.run }
       assert_match(/Invalid XML formatting/, error.message)
       assert_match(/bad_format.xml/, error.message)
     end
