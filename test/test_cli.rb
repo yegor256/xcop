@@ -17,8 +17,11 @@ class CLITest < Minitest::Test
       cli = Xcop::CLI.new([f])
       result = nil
       cli.run { |file| result = file }
-      assert_equal(f, result,
-                   "Expected to run the valid XML '#{f}', but received '#{result}' instead")
+      assert_equal(
+        f,
+        result,
+        "Expected to run the valid XML '#{f}', but received '#{result}' instead"
+      )
     end
   end
 
@@ -27,16 +30,20 @@ class CLITest < Minitest::Test
       f = File.join(dir, 'invalid.xml')
       File.write(f, '<root><item>test</item></root>')
       cli = Xcop::CLI.new([f])
-      assert_raises(StandardError,
-                    "Expected to raise an error for invalid file '#{f}', but no error was raised") { cli.run }
+      assert_raises(
+        StandardError,
+        "Expected to raise an error for invalid file '#{f}', but no error was raised"
+      ) { cli.run }
     end
   end
 
   def test_run_nonexistent_file_exception
     f = '/tmp/nonexistent_file.xml'
     cli = Xcop::CLI.new([f])
-    assert_raises(Errno::ENOENT,
-                  "Expected to raise an error for nonexistent file '#{f}', but no error was raised") { cli.run }
+    assert_raises(
+      Errno::ENOENT,
+      "Expected to raise an error for nonexistent file '#{f}', but no error was raised"
+    ) { cli.run }
   end
 
   def test_run_empty_file_runtime_error
@@ -44,8 +51,10 @@ class CLITest < Minitest::Test
       f = File.join(dir, 'empty.xml')
       File.write(f, '')
       cli = Xcop::CLI.new([f])
-      assert_raises(RuntimeError,
-                    "Expected to raise an error for empty file '#{f}', but no error was raised") { cli.run }
+      assert_raises(
+        RuntimeError,
+        "Expected to raise an error for empty file '#{f}', but no error was raised"
+      ) { cli.run }
     end
   end
 
@@ -58,12 +67,21 @@ class CLITest < Minitest::Test
       processed = []
       cli = Xcop::CLI.new([f1, f2])
       cli.run { |file| processed << file }
-      assert_equal(2, processed.length,
-                   "Expected 2 of processed files, got '#{processed.length}'")
-      assert_includes(processed, f1,
-                      "Expected to include '#{f1}' by the processed")
-      assert_includes(processed, f2,
-                      "Expected to include '#{f2}' by the processed")
+      assert_equal(
+        2,
+        processed.length,
+        "Expected 2 of processed files, got '#{processed.length}'"
+      )
+      assert_includes(
+        processed,
+        f1,
+        "Expected to include '#{f1}' by the processed"
+      )
+      assert_includes(
+        processed,
+        f2,
+        "Expected to include '#{f2}' by the processed"
+      )
     end
   end
 
@@ -72,12 +90,20 @@ class CLITest < Minitest::Test
       f = File.join(dir, 'bad_format.xml')
       File.write(f, '<?xml version="1.0"?><root><item>no proper indenting</item></root>')
       cli = Xcop::CLI.new([f])
-      error = assert_raises(RuntimeError,
-                            "Expected to raise an error for invalid file '#{f}', but no error was raised") { cli.run }
-      assert_match(/Invalid XML formatting/, error.message,
-                   "Expected to match '/Invalid XML formatting/' error message, got '#{error.message}'")
-      assert_match(/bad_format.xml/, error.message,
-                   "Expected to match '/bad_format.xml/' error message, got '#{error.message}'")
+      error = assert_raises(
+        RuntimeError,
+        "Expected to raise an error for invalid file '#{f}', but no error was raised"
+      ) { cli.run }
+      assert_match(
+        /Invalid XML formatting/,
+        error.message,
+        "Expected to match '/Invalid XML formatting/' error message, got '#{error.message}'"
+      )
+      assert_match(
+        /bad_format.xml/,
+        error.message,
+        "Expected to match '/bad_format.xml/' error message, got '#{error.message}'"
+      )
     end
   end
 
@@ -88,8 +114,11 @@ class CLITest < Minitest::Test
       File.write(f, content)
       cli = Xcop::CLI.new([f])
       cli.fix
-      assert_equal(content, File.read(f),
-                   "Expected to not fix valid file - '#{f}'")
+      assert_equal(
+        content,
+        File.read(f),
+        "Expected to not fix valid file - '#{f}'"
+      )
     end
   end
 
@@ -100,8 +129,11 @@ class CLITest < Minitest::Test
       original_content = File.read(f)
       cli = Xcop::CLI.new([f])
       cli.fix
-      refute_equal(original_content, File.read(f),
-                   "Expected to fix invalid file - '#{f}'")
+      refute_equal(
+        original_content,
+        File.read(f),
+        "Expected to fix invalid file - '#{f}'"
+      )
     end
   end
 
@@ -116,10 +148,16 @@ class CLITest < Minitest::Test
       fixed = []
       cli = Xcop::CLI.new([f1, f2])
       cli.fix { |file| fixed << file }
-      refute_equal(original_content1, File.read(f1),
-                   "Expected to fix invalid file - '#{f1}'")
-      refute_equal(original_content2, File.read(f2),
-                   "Expected to fix invalid file - '#{f2}'")
+      refute_equal(
+        original_content1,
+        File.read(f1),
+        "Expected to fix invalid file - '#{f1}'"
+      )
+      refute_equal(
+        original_content2,
+        File.read(f2),
+        "Expected to fix invalid file - '#{f2}'"
+      )
     end
   end
 end
