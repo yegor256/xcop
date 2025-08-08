@@ -5,7 +5,6 @@
 *.gem
 coverage/
 doc/
-Gemfile.lock
 node_modules/
 rdoc/
 vendor/

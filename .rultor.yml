@@ -21,7 +21,3 @@ release:
 merge:
   script: |-
     bundle exec rake
-deploy:
-  script: |-
-    echo "There is nothing to deploy"
-    exit -1
