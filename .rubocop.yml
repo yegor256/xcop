@@ -3,8 +3,9 @@
 ---
 AllCops:
   Exclude:
-    - 'bin/**/*'
-    - 'assets/**/*'
+    - "bin/**/*"
+    - "assets/**/*"
+    - "vendor/**/*"
   DisplayCopNames: true
   TargetRubyVersion: 2.2
   NewCops: enable
@@ -19,6 +20,9 @@ Metrics/AbcSize:
   Enabled: false
 Metrics/BlockLength:
   Max: 50
+Metrics/ClassLength:
+  Exclude:
+    - "test/**/*"
 Minitest/EmptyLineBeforeAssertionMethods:
   Enabled: false
 Layout/EmptyLineAfterGuardClause:
