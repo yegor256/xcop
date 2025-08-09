@@ -191,6 +191,7 @@ You will need to have [Ruby](https://www.ruby-lang.org/en/) 2.3+ and
 [Bundler](https://bundler.io/) installed. Then:
 
 ```bash
+bundle config set --local path 'vendor/bundle'
 bundle update
 bundle exec rake
 ```
