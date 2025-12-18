@@ -8,5 +8,6 @@ SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
 
 require 'minitest/reporters'
 Minitest::Reporters.use! [Minitest::Reporters::SpecReporter.new]
+Minitest.load :minitest_reporter
 
 require 'minitest/autorun'
