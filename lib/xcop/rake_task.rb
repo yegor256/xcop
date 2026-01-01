@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2017-2025 Yegor Bugayenko
+# SPDX-FileCopyrightText: Copyright (c) 2017-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
 require 'rake'
@@ -7,7 +7,7 @@ require_relative '../xcop/cli'
 
 # Xcop rake task.
 # Author:: Yegor Bugayenko (yegor256@gmail.com)
-# Copyright:: Copyright (c) 2017-2025 Yegor Bugayenko
+# Copyright:: Copyright (c) 2017-2026 Yegor Bugayenko
 # License:: MIT
 class Xcop::RakeTask < Rake::TaskLib
   attr_accessor :name, :fail_on_error, :excludes, :includes, :quiet
