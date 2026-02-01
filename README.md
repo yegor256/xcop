@@ -14,11 +14,9 @@
 This command line tool validates your XML files for proper formatting.
 If they are not formatted correctly, it prints the difference
   and exits with an error.
-You can use it in two ways:
-  1) to fail your build if any XML-ish files
+You can use it in two ways: 1) to fail your build if any XML-ish files
   (for example, XML, XSD, XSL, or XHTML) are not formatted correctly,
-  and
-  2) to format them correctly using the `--fix` option.
+  and 2) to format them correctly using the `--fix` option.
 
 Read this blog post first: [_XCOP—XML Style Checker_][blog].
 
