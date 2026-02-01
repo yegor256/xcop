@@ -1,6 +1,4 @@
-# XCOP
-
-<img alt="XCOP logo" src="/logo.svg" width="64px"/>
+# Style Checker (Linter) for XML Files
 
 [![EO principles respected here](https://www.elegantobjects.org/badge.svg)](https://www.elegantobjects.org)
 [![DevOps By Rultor.com](https://www.rultor.com/b/yegor256/xcop)](https://www.rultor.com/p/yegor256/xcop)
@@ -10,21 +8,21 @@
 [![PDD status](https://www.0pdd.com/svg?name=yegor256/xcop)](https://www.0pdd.com/p?name=yegor256/xcop)
 [![Gem Version](https://badge.fury.io/rb/xcop.svg)](https://badge.fury.io/rb/xcop)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/yegor256/xcop/blob/master/LICENSE.txt)
-[![Maintainability](https://api.codeclimate.com/v1/badges/396ec0584e0a84adc723/maintainability)](https://codeclimate.com/github/yegor256/xcop/maintainability)
 [![Test Coverage](https://img.shields.io/codecov/c/github/yegor256/xcop.svg)](https://codecov.io/github/yegor256/xcop?branch=master)
 [![Hits-of-Code](https://hitsofcode.com/github/yegor256/xcop)](https://hitsofcode.com/view/github/yegor256/xcop)
 
 This command line tool validates your XML files for proper formatting.
-If they are not formatted correctly, it prints the difference and
-exits with an error. You can use it in two ways: 1) to fail your build
-if any XML-ish files (for example, XML, XSD, XSL, or XHTML) are not formatted correctly,
-and 2) to format them correctly using the `--fix` option.
+If they are not formatted correctly, it prints the difference
+  and exits with an error.
+You can use it in two ways:
+  1) to fail your build if any XML-ish files
+  (for example, XML, XSD, XSL, or XHTML) are not formatted correctly,
+  and
+  2) to format them correctly using the `--fix` option.
 
-Read this blog post first:
-[_XCOP—XML Style Checker_](https://www.yegor256.com/2017/08/29/xcop.html).
+Read this blog post first: [_XCOP—XML Style Checker_][blog].
 
-Make sure you have [Ruby installed](https://www.ruby-lang.org/en/documentation/installation/)
-and then install the tool:
+Make sure you have [Ruby] installed and then install the tool:
 
 ```bash
 gem install xcop
@@ -196,3 +194,6 @@ bundle exec rake
 ```
 
 If it's clean and you don't see any error messages, submit your pull request.
+
+[Ruby]: https://www.ruby-lang.org/en/documentation/installation/
+[blog]: https://www.yegor256.com/2017/08/29/xcop.html
