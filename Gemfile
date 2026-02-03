@@ -4,7 +4,7 @@
 source 'https://rubygems.org'
 gemspec
 
-gem 'cucumber', '~>9.2', require: false
+gem 'cucumber', '~>10.0', require: false
 gem 'erb', '~>6.0', require: false
 gem 'loog', '>0', require: false
 gem 'minitest', '~>6.0', require: false
