@@ -122,7 +122,7 @@ To customize the files pattern, use the `files` parameter:
 ## How to use in Maven `pom.xml`?
 
 You can integrate it with the help of
-[maven-antrun-plugin](http://maven.apache.org/plugins/maven-antrun-plugin/):
+[maven-antrun-plugin](https://maven.apache.org/plugins/maven-antrun-plugin/):
 
 ```xml
 <project>

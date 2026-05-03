@@ -71,17 +71,17 @@ class CLITest < Minitest::Test
       assert_equal(
         2,
         processed.length,
-        "Expected 2 of processed files, got '#{processed.length}'"
+        "Expected 2 processed files, got '#{processed.length}'"
       )
       assert_includes(
         processed,
         f1,
-        "Expected to include '#{f1}' by the processed"
+        "Expected '#{f1}' to be processed"
       )
       assert_includes(
         processed,
         f2,
-        "Expected to include '#{f2}' by the processed"
+        "Expected '#{f2}' to be processed"
       )
     end
   end
