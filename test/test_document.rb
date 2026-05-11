@@ -112,59 +112,43 @@ class TestXcop < Minitest::Test
     end
   end
 
+  XSI = 'http://www.w3.org/2001/XMLSchema-instance'.freeze
+  PERSON_XSD = <<-XSD.freeze
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="person">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+  XSD
+
   def test_xsd_validation_detects_invalid_xml
     Dir.mktmpdir 'test_xsd_invalid' do |dir|
-      xsd = File.join(dir, 'schema.xsd')
-      File.write(
-        xsd,
-        "<?xml version=\"1.0\"?>\n" \
-        "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n" \
-        "  <xs:element name=\"person\">\n" \
-        "    <xs:complexType>\n" \
-        "      <xs:sequence>\n" \
-        "        <xs:element name=\"name\" type=\"xs:string\"/>\n" \
-        "      </xs:sequence>\n" \
-        "    </xs:complexType>\n" \
-        "  </xs:element>\n" \
-        "</xs:schema>\n"
-      )
+      File.write(File.join(dir, 'schema.xsd'), PERSON_XSD)
       xml = File.join(dir, 'bad.xml')
-      File.write(
-        xml,
-        "<?xml version=\"1.0\"?>\n" \
-        "<person xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" \
-        " xsi:noNamespaceSchemaLocation=\"schema.xsd\">\n" \
-        "</person>\n"
-      )
+      File.write(xml, <<-XML)
+<?xml version="1.0"?>
+<person xmlns:xsi="#{XSI}" xsi:noNamespaceSchemaLocation="schema.xsd">
+</person>
+      XML
       refute_empty(Xcop::Document.new(xml).validate, 'Expected XSD errors for invalid XML')
     end
   end
 
   def test_xsd_validation_passes_for_valid_xml
     Dir.mktmpdir 'test_xsd_valid' do |dir|
-      xsd = File.join(dir, 'schema.xsd')
-      File.write(
-        xsd,
-        "<?xml version=\"1.0\"?>\n" \
-        "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n" \
-        "  <xs:element name=\"person\">\n" \
-        "    <xs:complexType>\n" \
-        "      <xs:sequence>\n" \
-        "        <xs:element name=\"name\" type=\"xs:string\"/>\n" \
-        "      </xs:sequence>\n" \
-        "    </xs:complexType>\n" \
-        "  </xs:element>\n" \
-        "</xs:schema>\n"
-      )
+      File.write(File.join(dir, 'schema.xsd'), PERSON_XSD)
       xml = File.join(dir, 'good.xml')
-      File.write(
-        xml,
-        "<?xml version=\"1.0\"?>\n" \
-        "<person xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" \
-        " xsi:noNamespaceSchemaLocation=\"schema.xsd\">\n" \
-        "  <name>John</name>\n" \
-        "</person>\n"
-      )
+      File.write(xml, <<-XML)
+<?xml version="1.0"?>
+<person xmlns:xsi="#{XSI}" xsi:noNamespaceSchemaLocation="schema.xsd">
+  <name>John</name>
+</person>
+      XML
       assert_empty(Xcop::Document.new(xml).validate, 'Expected no XSD errors for valid XML')
     end
   end
