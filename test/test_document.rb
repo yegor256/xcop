@@ -111,4 +111,69 @@ class TestXcop < Minitest::Test
       )
     end
   end
+
+  def test_xsd_validation_detects_invalid_xml
+    Dir.mktmpdir 'test_xsd_invalid' do |dir|
+      xsd = File.join(dir, 'schema.xsd')
+      File.write(
+        xsd,
+        "<?xml version=\"1.0\"?>\n" \
+        "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n" \
+        "  <xs:element name=\"person\">\n" \
+        "    <xs:complexType>\n" \
+        "      <xs:sequence>\n" \
+        "        <xs:element name=\"name\" type=\"xs:string\"/>\n" \
+        "      </xs:sequence>\n" \
+        "    </xs:complexType>\n" \
+        "  </xs:element>\n" \
+        "</xs:schema>\n"
+      )
+      xml = File.join(dir, 'bad.xml')
+      File.write(
+        xml,
+        "<?xml version=\"1.0\"?>\n" \
+        "<person xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" \
+        " xsi:noNamespaceSchemaLocation=\"schema.xsd\">\n" \
+        "</person>\n"
+      )
+      refute_empty(Xcop::Document.new(xml).validate, 'Expected XSD errors for invalid XML')
+    end
+  end
+
+  def test_xsd_validation_passes_for_valid_xml
+    Dir.mktmpdir 'test_xsd_valid' do |dir|
+      xsd = File.join(dir, 'schema.xsd')
+      File.write(
+        xsd,
+        "<?xml version=\"1.0\"?>\n" \
+        "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n" \
+        "  <xs:element name=\"person\">\n" \
+        "    <xs:complexType>\n" \
+        "      <xs:sequence>\n" \
+        "        <xs:element name=\"name\" type=\"xs:string\"/>\n" \
+        "      </xs:sequence>\n" \
+        "    </xs:complexType>\n" \
+        "  </xs:element>\n" \
+        "</xs:schema>\n"
+      )
+      xml = File.join(dir, 'good.xml')
+      File.write(
+        xml,
+        "<?xml version=\"1.0\"?>\n" \
+        "<person xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" \
+        " xsi:noNamespaceSchemaLocation=\"schema.xsd\">\n" \
+        "  <name>John</name>\n" \
+        "</person>\n"
+      )
+      assert_empty(Xcop::Document.new(xml).validate, 'Expected no XSD errors for valid XML')
+    end
+  end
+
+  def test_xsd_validation_skipped_when_no_schema
+    Dir.mktmpdir 'test_xsd_absent' do |dir|
+      f = File.join(dir, 'plain.xml')
+      File.write(f, "<?xml version=\"1.0\"?>\n<root/>\n")
+      assert_empty(Xcop::Document.new(f).validate, 'Expected no XSD errors when no schema declared')
+    end
+  end
 end
