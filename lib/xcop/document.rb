@@ -29,6 +29,18 @@ class Xcop::Document
     File.write(@path, ideal)
   end
 
+  # Validates the document against its declared XSD schema, if any.
+  # Returns an array of error message strings (empty when valid or no schema declared).
+  def validate
+    xml = Nokogiri::XML(File.open(@path))
+    schema_path = xsd_schema_path(xml)
+    return [] unless schema_path
+    return [] unless File.exist?(schema_path)
+    Nokogiri::XML::Schema(File.read(schema_path)).validate(xml).map(&:message)
+  end
+
+  XSI_NS = 'http://www.w3.org/2001/XMLSchema-instance'.freeze
+
   private
 
   # The canonical, well-formatted version of the document.
@@ -61,6 +73,21 @@ class Xcop::Document
       node.namespace_definitions.each { |ns| declared << ns.prefix }
     end
     declared - used
+  end
+
+  def xsd_schema_path(xml)
+    root = xml.root
+    return nil unless root
+    no_ns = root.at_xpath('@xsi:noNamespaceSchemaLocation', 'xsi' => XSI_NS)
+    with_ns = root.at_xpath('@xsi:schemaLocation', 'xsi' => XSI_NS)
+    location =
+      if no_ns
+        no_ns.value
+      elsif with_ns
+        with_ns.value.split.last
+      end
+    return nil unless location
+    File.expand_path(location, File.dirname(@path))
   end
 
   def differ(ideal, fact, nocolor: false)

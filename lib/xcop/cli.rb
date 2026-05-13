@@ -33,6 +33,11 @@ class Xcop::CLI
         puts diff
         raise "Invalid XML formatting in #{f}"
       end
+      errors = doc.validate
+      unless errors.empty?
+        puts errors.join("\n")
+        raise "XSD validation failed in #{f}"
+      end
       yield(f) if block_given?
     end
   end

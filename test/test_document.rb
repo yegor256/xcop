@@ -111,4 +111,53 @@ class TestXcop < Minitest::Test
       )
     end
   end
+
+  XSI = 'http://www.w3.org/2001/XMLSchema-instance'.freeze
+  PERSON_XSD = <<-XSD.freeze
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="person">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+  XSD
+
+  def test_xsd_validation_detects_invalid_xml
+    Dir.mktmpdir 'test_xsd_invalid' do |dir|
+      File.write(File.join(dir, 'schema.xsd'), PERSON_XSD)
+      xml = File.join(dir, 'bad.xml')
+      File.write(xml, <<-XML)
+<?xml version="1.0"?>
+<person xmlns:xsi="#{XSI}" xsi:noNamespaceSchemaLocation="schema.xsd">
+</person>
+      XML
+      refute_empty(Xcop::Document.new(xml).validate, 'Expected XSD errors for invalid XML')
+    end
+  end
+
+  def test_xsd_validation_passes_for_valid_xml
+    Dir.mktmpdir 'test_xsd_valid' do |dir|
+      File.write(File.join(dir, 'schema.xsd'), PERSON_XSD)
+      xml = File.join(dir, 'good.xml')
+      File.write(xml, <<-XML)
+<?xml version="1.0"?>
+<person xmlns:xsi="#{XSI}" xsi:noNamespaceSchemaLocation="schema.xsd">
+  <name>John</name>
+</person>
+      XML
+      assert_empty(Xcop::Document.new(xml).validate, 'Expected no XSD errors for valid XML')
+    end
+  end
+
+  def test_xsd_validation_skipped_when_no_schema
+    Dir.mktmpdir 'test_xsd_absent' do |dir|
+      f = File.join(dir, 'plain.xml')
+      File.write(f, "<?xml version=\"1.0\"?>\n<root/>\n")
+      assert_empty(Xcop::Document.new(f).validate, 'Expected no XSD errors when no schema declared')
+    end
+  end
 end
