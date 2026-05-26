@@ -30,6 +30,17 @@ class TestXcop < Minitest::Test
     end
   end
 
+  def test_keeps_utf8_text_without_encoding_declaration
+    Dir.mktmpdir 'test_utf8' do |dir|
+      f = File.join(dir, 'utf8.xml')
+      File.write(
+        f,
+        "<?xml version=\"1.0\"?>\n<a>\n  <b>Fabr\u00EDcio</b>\n</a>\n"
+      )
+      assert_equal('', Xcop::Document.new(f).diff(nocolor: true))
+    end
+  end
+
   def test_fixes_document
     Dir.mktmpdir 'test3' do |dir|
       f = File.join(dir, 'bad.xml')
