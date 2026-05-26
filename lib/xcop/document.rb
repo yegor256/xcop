@@ -20,7 +20,7 @@ class Xcop::Document
 
   # Return the difference, if any (empty string if everything is clean).
   def diff(nocolor: false)
-    now = File.read(@path)
+    now = File.read(@path, encoding: Encoding::UTF_8)
     differ(ideal, now, nocolor: nocolor)
   end
 
@@ -46,7 +46,8 @@ class Xcop::Document
   # The canonical, well-formatted version of the document.
   def ideal
     xml = Nokogiri::XML(File.open(@path), &:noblanks)
-    text = xml.to_xml(indent: 2)
+    missing_encoding = xml.encoding.nil?
+    text = xml_to_text(xml, missing_encoding)
     unused_namespace_prefixes(xml).each do |prefix|
       text =
         if prefix.nil?
@@ -55,7 +56,15 @@ class Xcop::Document
           text.gsub(/\s+xmlns:#{Regexp.escape(prefix)}="[^"]*"/, '')
         end
     end
-    Nokogiri::XML(text, &:noblanks).to_xml(indent: 2)
+    xml_to_text(Nokogiri::XML(text, &:noblanks), missing_encoding)
+  end
+
+  def xml_to_text(xml, missing_encoding)
+    return xml.to_xml(indent: 2) unless missing_encoding
+    xml.to_xml(indent: 2, encoding: 'UTF-8').sub(
+      /^<\?xml version="1\.0" encoding="UTF-8"\?>/,
+      '<?xml version="1.0"?>'
+    )
   end
 
   # Returns the set of namespace prefixes that are declared in +xml+
