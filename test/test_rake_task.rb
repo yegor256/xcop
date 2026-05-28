@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 require 'minitest/autorun'
-require 'tmpdir'
 require 'rake'
+require 'tmpdir'
 require_relative '../lib/xcop/rake_task'
 
 # Xcop rake task.
@@ -12,7 +12,7 @@ require_relative '../lib/xcop/rake_task'
 # License:: MIT
 class TestRakeTask < Minitest::Test
   def test_basic
-    Dir.mktmpdir 'test' do |dir|
+    Dir.mktmpdir('test') do |dir|
       Dir.chdir(dir)
       f = File.join(dir, 'a.xml')
       File.write(f, "<?xml version=\"1.0\"?>\n<x/>\n")
@@ -25,14 +25,14 @@ class TestRakeTask < Minitest::Test
   end
 
   def test_with_broken_xml
-    Dir.mktmpdir 'test' do |dir|
+    Dir.mktmpdir('test') do |dir|
       Dir.chdir(dir)
       f = File.join(dir, 'broken.xml')
       File.write(f, "<z><a><b></b></a>\n\n</z>")
       Xcop::RakeTask.new(:xcop2) do |task|
         task.excludes = ['test/**/*']
       end
-      assert_raises SystemExit do
+      assert_raises(SystemExit) do
         Rake::Task['xcop2'].invoke
       end
       File.delete(f)

@@ -29,8 +29,11 @@ Layout/EmptyLineAfterGuardClause:
   Enabled: false
 Style/ClassAndModuleChildren:
   Enabled: false
+Elegant/NoRedundantVariable:
+  Exclude:
+    - 'test/**/*'
 plugins:
   - rubocop-minitest
   - rubocop-performance
   - rubocop-rake
-require: []
+  - rubocop-elegant

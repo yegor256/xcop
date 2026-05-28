@@ -8,7 +8,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require_relative 'lib/xcop/version'
 
 Gem::Specification.new do |s|
-  s.required_rubygems_version = Gem::Requirement.new('>= 0') if s.respond_to? :required_rubygems_version=
+  s.required_rubygems_version = Gem::Requirement.new('>= 0') if s.respond_to?(:required_rubygems_version=)
   s.required_ruby_version = '>= 2.2'
   s.name = 'xcop'
   s.version = Xcop::VERSION
@@ -23,8 +23,8 @@ Gem::Specification.new do |s|
   s.executables = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.rdoc_options = ['--charset=UTF-8']
   s.extra_rdoc_files = ['README.md', 'LICENSE.txt']
-  s.add_dependency 'differ', '~>0.1.2'
-  s.add_dependency 'nokogiri', '~>1.8'
-  s.add_dependency 'rainbow', '~>3.0'
-  s.add_dependency 'slop', '~>4.4'
+  s.add_dependency('differ', '~>0.1.2')
+  s.add_dependency('nokogiri', '~>1.8')
+  s.add_dependency('rainbow', '~>3.0')
+  s.add_dependency('slop', '~>4.4')
 end

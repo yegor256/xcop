@@ -1,20 +1,21 @@
 # SPDX-FileCopyrightText: Copyright (c) 2017-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
-require 'nokogiri'
-require 'tmpdir'
-require 'slop'
 require 'English'
+require 'nokogiri'
+require 'slop'
+require 'tmpdir'
 
 Before do
   @cwd = Dir.pwd
   @dir = Dir.mktmpdir('test')
   FileUtils.mkdir_p(@dir)
   Dir.chdir(@dir)
-  @opts = Slop.parse ['-v', '-s', @dir] do |o|
-    o.bool '-v', '--verbose'
-    o.string '-s', '--source'
-  end
+  @opts =
+    Slop.parse(['-v', '-s', @dir]) do |o|
+      o.bool('-v', '--verbose')
+      o.string('-s', '--source')
+    end
 end
 
 After do
@@ -34,19 +35,19 @@ When(%r{^I run bin/xcop with "([^"]*)"$}) do |arg|
 end
 
 Then(/^Stdout contains "([^"]*)"$/) do |txt|
-  raise "STDOUT doesn't contain '#{txt}':\n#{@stdout}" unless @stdout.include?(txt)
+  raise(StandardError, "STDOUT doesn't contain '#{txt}':\n#{@stdout}") unless @stdout.include?(txt)
 end
 
 Then(/^Stdout is empty$/) do
-  raise "STDOUT is not empty:\n#{@stdout}" unless @stdout == ''
+  raise(StandardError, "STDOUT is not empty:\n#{@stdout}") unless @stdout == ''
 end
 
 Then(/^Exit code is zero$/) do
-  raise "Non-zero exit #{@exitstatus}:\n#{@stdout}" unless @exitstatus.zero?
+  raise(StandardError, "Non-zero exit #{@exitstatus}:\n#{@stdout}") unless @exitstatus.zero?
 end
 
 Then(/^Exit code is not zero$/) do
-  raise 'Zero exit code' if @exitstatus.zero?
+  raise(StandardError, 'Zero exit code') if @exitstatus.zero?
 end
 
 When(/^I run bash with "([^"]*)"$/) do |text|

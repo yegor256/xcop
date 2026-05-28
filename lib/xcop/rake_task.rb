@@ -18,9 +18,9 @@ class Xcop::RakeTask < Rake::TaskLib
     @includes = %w[xml xsd xhtml xsl html].map { |e| "**/*.#{e}" }
     @excludes = []
     @quiet = false
-    desc 'Run Xcop' unless ::Rake.application.last_description
+    desc('Run Xcop') unless ::Rake.application.last_description
     task(name, *args) do |_, task_args|
-      RakeFileUtils.send(:verbose, true) do
+      RakeFileUtils.__send__(:verbose, true) do
         yield(*[self, task_args].slice(0, task_block.arity)) if block_given?
         run
       end
@@ -30,22 +30,23 @@ class Xcop::RakeTask < Rake::TaskLib
   private
 
   def run
-    puts 'Running xcop...' unless @quiet
+    puts('Running xcop...') unless @quiet
     bad = Dir.glob(@excludes)
     good = Dir.glob(@includes).reject { |f| bad.include?(f) }
-    puts "Inspecting #{pluralize(good.length, 'file')}..." unless @quiet
+    puts("Inspecting #{pluralize(good.length, 'file')}...") unless @quiet
     begin
       Xcop::CLI.new(good).run do
-        print Rainbow('.').green unless @quiet
+        print(Rainbow('.').green) unless @quiet
       end
     rescue StandardError => e
-      puts e.message
+      puts(e.message)
       abort(e.message)
     end
     return if @quiet
-    puts \
+    puts(
       "\n#{pluralize(good.length, 'file')} checked, " \
       "everything looks #{Rainbow('pretty').green}"
+    )
   end
 
   def pluralize(num, text)

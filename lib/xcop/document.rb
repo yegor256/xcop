@@ -1,8 +1,8 @@
 # SPDX-FileCopyrightText: Copyright (c) 2017-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
-require 'nokogiri'
 require 'differ'
+require 'nokogiri'
 require 'rainbow'
 require 'set'
 require_relative 'version'
@@ -20,8 +20,7 @@ class Xcop::Document
 
   # Return the difference, if any (empty string if everything is clean).
   def diff(nocolor: false)
-    now = File.read(@path)
-    differ(ideal, now, nocolor: nocolor)
+    differ(ideal, File.read(@path), nocolor: nocolor)
   end
 
   # Fixes the document.
@@ -33,10 +32,10 @@ class Xcop::Document
   # Returns an array of error message strings (empty when valid or no schema declared).
   def validate
     xml = Nokogiri::XML(File.open(@path))
-    schema_path = xsd_schema_path(xml)
-    return [] unless schema_path
-    return [] unless File.exist?(schema_path)
-    Nokogiri::XML::Schema(File.read(schema_path)).validate(xml).map(&:message)
+    xsd = schema(xml)
+    return [] unless xsd
+    return [] unless File.exist?(xsd)
+    Nokogiri::XML::Schema(File.read(xsd)).validate(xml).map(&:message)
   end
 
   XSI_NS = 'http://www.w3.org/2001/XMLSchema-instance'.freeze
@@ -47,7 +46,7 @@ class Xcop::Document
   def ideal
     xml = Nokogiri::XML(File.open(@path), &:noblanks)
     text = xml.to_xml(indent: 2)
-    unused_namespace_prefixes(xml).each do |prefix|
+    unused(xml).each do |prefix|
       text =
         if prefix.nil?
           text.gsub(/\s+xmlns="[^"]*"/, '')
@@ -61,7 +60,7 @@ class Xcop::Document
   # Returns the set of namespace prefixes that are declared in +xml+
   # but never referenced by any element or attribute. A +nil+ entry in
   # the set represents the default namespace.
-  def unused_namespace_prefixes(xml)
+  def unused(xml)
     used = Set.new
     declared = Set.new
     xml.traverse do |node|
@@ -75,18 +74,18 @@ class Xcop::Document
     declared - used
   end
 
-  def xsd_schema_path(xml)
+  def schema(xml)
     root = xml.root
-    return nil unless root
-    no_ns = root.at_xpath('@xsi:noNamespaceSchemaLocation', 'xsi' => XSI_NS)
-    with_ns = root.at_xpath('@xsi:schemaLocation', 'xsi' => XSI_NS)
+    return unless root
+    plain = root.at_xpath('@xsi:noNamespaceSchemaLocation', 'xsi' => XSI_NS)
+    mapped = root.at_xpath('@xsi:schemaLocation', 'xsi' => XSI_NS)
     location =
-      if no_ns
-        no_ns.value
-      elsif with_ns
-        with_ns.value.split.last
+      if plain
+        plain.value
+      elsif mapped
+        mapped.value.split.last
       end
-    return nil unless location
+    return unless location
     File.expand_path(location, File.dirname(@path))
   end
 
