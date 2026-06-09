@@ -40,6 +40,26 @@ class TestXcop < Minitest::Test
     end
   end
 
+  def test_fix_reports_fixed_when_file_rewritten
+    Dir.mktmpdir('test_fix_changed') do |dir|
+      f = File.join(dir, 'bad.xml')
+      File.write(f, '<hello>My friend!</hello>')
+      assert_equal(:fixed, Xcop::Document.new(f).fix, 'Expected fix to report :fixed on a file that needed rewriting')
+    end
+  end
+
+  def test_fix_reports_untouched_when_file_canonical
+    Dir.mktmpdir('test_fix_untouched') do |dir|
+      f = File.join(dir, 'good.xml')
+      File.write(f, "<?xml version=\"1.0\"?>\n<hello>Dude!</hello>\n")
+      assert_equal(
+        :untouched,
+        Xcop::Document.new(f).fix,
+        'Expected fix to report :untouched on an already-canonical file'
+      )
+    end
+  end
+
   def test_fix_removes_unused_namespace
     Dir.mktmpdir('test_ns_unused') do |dir|
       f = File.join(dir, 'ns.xml')

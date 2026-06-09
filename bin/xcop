@@ -65,8 +65,8 @@ if opts[:exclude]
 end
 
 if opts.fix?
-  Xcop::CLI.new(files).fix do |f|
-    puts "#{f} fixed" unless opts.quiet?
+  Xcop::CLI.new(files).fix do |f, status|
+    puts "#{f} #{status}" unless opts.quiet?
   end
 else
   begin
