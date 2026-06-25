@@ -15,7 +15,7 @@ GEM
     base64 (0.3.0)
     bigdecimal (4.1.2)
     builder (3.3.0)
-    cucumber (11.1.0)
+    cucumber (11.1.1)
       base64 (~> 0.2)
       builder (~> 3.2)
       cucumber-ci-environment (> 9, < 12)
