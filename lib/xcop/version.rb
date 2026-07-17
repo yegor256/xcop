@@ -6,5 +6,5 @@
 # Copyright:: Copyright (c) 2017-2026 Yegor Bugayenko
 # License:: MIT
 module Xcop
-  VERSION = '0.0.0'.freeze
+  VERSION = '0.10.2'.freeze
 end
