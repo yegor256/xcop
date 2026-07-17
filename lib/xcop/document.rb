@@ -126,6 +126,16 @@ class Xcop::Document
     declared - used
   end
 
+  # Returns the absolute path of the local XSD schema declared by +xml+,
+  # or +nil+ when no schema is declared or the declared location is not a
+  # local file. The location comes from +xsi:noNamespaceSchemaLocation+
+  # or, failing that, from the second token of +xsi:schemaLocation+.
+  #
+  # A +schemaLocation+ is a URI, not a file path, so a remote schema such
+  # as +http://maven.apache.org/xsd/maven-4.0.0.xsd+ (the normal case for
+  # Maven +pom.xml+, +settings.xml+ and +site.xml+) must not be treated as
+  # a local file. Any location that carries a URL scheme is therefore
+  # skipped, leaving only truly local schemas to be validated. See #163.
   def schema(xml)
     root = xml.root
     return unless root
@@ -138,6 +148,7 @@ class Xcop::Document
         mapped.value.split.last
       end
     return unless location
+    return if location.match?(%r{\A[a-z][a-z0-9+.-]*://}i)
     File.expand_path(location, File.dirname(@path))
   end
 
