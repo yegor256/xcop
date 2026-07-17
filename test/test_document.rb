@@ -181,6 +181,48 @@ class TestXcop < Minitest::Test
     end
   end
 
+  def test_fix_collapses_single_line_comment
+    Dir.mktmpdir('test_comment_single') do |dir|
+      f = File.join(dir, 'c.xml')
+      File.write(f, "<?xml version=\"1.0\"?>\n<a>\n  <!--   text   -->\n</a>\n")
+      Xcop::Document.new(f).fix
+      got = File.read(f)
+      assert_includes(got, '<!-- text -->', "Expected single-line comment to be collapsed, got '#{got}'")
+    end
+  end
+
+  def test_fix_reshapes_multi_line_comment
+    Dir.mktmpdir('test_comment_multi') do |dir|
+      f = File.join(dir, 'c.xml')
+      File.write(f, "<?xml version=\"1.0\"?>\n<a>\n  <!-- line1\n       line2 -->\n</a>\n")
+      Xcop::Document.new(f).fix
+      assert_equal(
+        "<?xml version=\"1.0\"?>\n<a>\n  <!--\n  line1\n  line2\n  -->\n</a>\n",
+        File.read(f),
+        "Expected multi-line comment to be reshaped, got '#{File.read(f)}'"
+      )
+    end
+  end
+
+  def test_diff_flags_messy_comment
+    Dir.mktmpdir('test_comment_diff') do |dir|
+      f = File.join(dir, 'c.xml')
+      File.write(f, "<?xml version=\"1.0\"?>\n<a>\n  <!--messy-->\n</a>\n")
+      refute_empty(
+        Xcop::Document.new(f).diff(nocolor: true),
+        'Expected non-empty diff for a document with a badly formatted comment'
+      )
+    end
+  end
+
+  def test_fix_leaves_canonical_comments_untouched
+    Dir.mktmpdir('test_comment_ok') do |dir|
+      f = File.join(dir, 'c.xml')
+      File.write(f, "<?xml version=\"1.0\"?>\n<a>\n  <!-- text -->\n  <!--\n  line1\n  line2\n  -->\n</a>\n")
+      assert_equal(:untouched, Xcop::Document.new(f).fix, 'Expected already-canonical comments to be left untouched')
+    end
+  end
+
   def test_diff_leaves_no_open_handle
     Dir.mktmpdir('test_diff_leak') do |dir|
       f = File.join(dir, 'a.xml')
