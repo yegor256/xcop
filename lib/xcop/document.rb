@@ -51,6 +51,7 @@ class Xcop::Document
   # The canonical, well-formatted version of the document.
   def ideal
     xml = Nokogiri::XML(File.read(@path), &:noblanks)
+    reshape(xml)
     text = xml.to_xml(indent: 2)
     unused(xml).each do |prefix|
       text =
@@ -61,6 +62,42 @@ class Xcop::Document
         end
     end
     Nokogiri::XML(text, &:noblanks).to_xml(indent: 2)
+  end
+
+  # Rewrites every comment node into one of two canonical shapes so that
+  # +diff+ and +--fix+ can report and correct sloppy comment layout. A
+  # comment whose text has no end-of-line character is collapsed onto a
+  # single line as +<!-- text -->+. A comment whose text spans several
+  # lines is re-emitted with +<!--+ and +-->+ each alone on their own
+  # line and every body line trimmed to the comment's own indent.
+  def reshape(xml)
+    xml.traverse do |node|
+      next unless node.comment?
+      node.native_content = canonical(node)
+    end
+  end
+
+  # The canonical inner text (the part between +<!--+ and +-->+) for a
+  # single comment node, indented to match the node's depth.
+  def canonical(node)
+    raw = node.content
+    body = raw.strip
+    return " #{body} " unless raw.include?("\n")
+    indent = '  ' * depth(node)
+    body = body.split("\n").map { |line| line.strip.empty? ? '' : indent + line.strip }.join("\n")
+    "\n#{body}\n#{indent}"
+  end
+
+  # The number of ancestor elements of +node+, which equals the number
+  # of two-space indentation levels that +to_xml+ places before it.
+  def depth(node)
+    levels = 0
+    parent = node.parent
+    while parent && parent.element?
+      levels += 1
+      parent = parent.parent
+    end
+    levels
   end
 
   # Returns the set of namespace prefixes that are declared in +xml+
