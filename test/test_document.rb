@@ -109,6 +109,42 @@ class TestXcop < Minitest::Test
     end
   end
 
+  def test_fix_keeps_xpath_attribute_namespace
+    Dir.mktmpdir('test_ns_used_xpath') do |dir|
+      f = File.join(dir, 'ns.xml')
+      File.write(f, <<-XML)
+<?xml version="1.0"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0">
+  <xsl:variable name="n" as="xs:integer" select="1"/>
+</xsl:stylesheet>
+      XML
+      Xcop::Document.new(f).fix
+      assert_includes(
+        File.read(f),
+        'xmlns:xs=',
+        "Expected xmlns:xs referenced only from an XPath attribute to be preserved, got '#{File.read(f)}'"
+      )
+    end
+  end
+
+  def test_fix_keeps_function_call_namespace
+    Dir.mktmpdir('test_ns_used_fn') do |dir|
+      f = File.join(dir, 'ns.xml')
+      File.write(f, <<-XML)
+<?xml version="1.0"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:eo="urn:eo" version="2.0">
+  <xsl:value-of select="eo:foo(.)"/>
+</xsl:stylesheet>
+      XML
+      Xcop::Document.new(f).fix
+      assert_includes(
+        File.read(f),
+        'xmlns:eo=',
+        "Expected xmlns:eo referenced only from a function call to be preserved, got '#{File.read(f)}'"
+      )
+    end
+  end
+
   def test_diff_flags_unused_namespace
     Dir.mktmpdir('test_ns_diff') do |dir|
       f = File.join(dir, 'ns.xml')
