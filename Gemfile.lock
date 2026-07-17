@@ -151,7 +151,7 @@ GEM
       unicode-emoji (~> 4.1)
     unicode-emoji (4.2.0)
     win32ole (1.9.3)
-    yard (0.9.44)
+    yard (0.9.45)
 
 PLATFORMS
   aarch64-linux-gnu
