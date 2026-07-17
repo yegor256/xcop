@@ -217,6 +217,38 @@ class TestXcop < Minitest::Test
     end
   end
 
+  def test_xsd_validation_skipped_for_remote_schema
+    Dir.mktmpdir('test_xsd_remote') do |dir|
+      xml = File.join(dir, 'pom.xml')
+      File.write(xml, <<-XML)
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="#{XSI}"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+</project>
+      XML
+      assert_empty(
+        Xcop::Document.new(xml).validate,
+        'Expected no XSD errors when schemaLocation points at a remote URL'
+      )
+    end
+  end
+
+  def test_xsd_skipped_for_remote_plain_schema
+    Dir.mktmpdir('test_xsd_remote_plain') do |dir|
+      xml = File.join(dir, 'doc.xml')
+      File.write(xml, <<-XML)
+<?xml version="1.0"?>
+<person xmlns:xsi="#{XSI}" xsi:noNamespaceSchemaLocation="https://example.com/person.xsd">
+</person>
+      XML
+      assert_empty(
+        Xcop::Document.new(xml).validate,
+        'Expected no XSD errors when noNamespaceSchemaLocation points at a remote URL'
+      )
+    end
+  end
+
   def test_fix_collapses_single_line_comment
     Dir.mktmpdir('test_comment_single') do |dir|
       f = File.join(dir, 'c.xml')
