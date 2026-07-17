@@ -37,7 +37,7 @@ class Xcop::Document
   # Returns an array of error message strings (empty when valid or no
   # schema declared); a declared but missing schema is itself an error.
   def validate
-    xml = Nokogiri::XML(File.open(@path))
+    xml = Nokogiri::XML(File.read(@path))
     xsd = schema(xml)
     return [] unless xsd
     return ["schema file is absent at #{xsd}"] unless File.exist?(xsd)
@@ -50,7 +50,7 @@ class Xcop::Document
 
   # The canonical, well-formatted version of the document.
   def ideal
-    xml = Nokogiri::XML(File.open(@path), &:noblanks)
+    xml = Nokogiri::XML(File.read(@path), &:noblanks)
     text = xml.to_xml(indent: 2)
     unused(xml).each do |prefix|
       text =

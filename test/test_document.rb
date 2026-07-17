@@ -180,4 +180,24 @@ class TestXcop < Minitest::Test
       refute_empty(Xcop::Document.new(xml).validate, 'Missing XSD schema cannot be silently ignored')
     end
   end
+
+  def test_diff_leaves_no_open_handle
+    Dir.mktmpdir('test_diff_leak') do |dir|
+      f = File.join(dir, 'a.xml')
+      File.write(f, "<?xml version=\"1.0\"?>\n<a/>\n")
+      Xcop::Document.new(f).diff
+      leaked = ObjectSpace.each_object(File).count { |io| !io.closed? && io.path == f }
+      assert_equal(0, leaked, 'Diffing cannot leave the file handle open')
+    end
+  end
+
+  def test_validate_leaves_no_open_handle
+    Dir.mktmpdir('test_validate_leak') do |dir|
+      f = File.join(dir, 'a.xml')
+      File.write(f, "<?xml version=\"1.0\"?>\n<a/>\n")
+      Xcop::Document.new(f).validate
+      leaked = ObjectSpace.each_object(File).count { |io| !io.closed? && io.path == f }
+      assert_equal(0, leaked, 'Validating cannot leave the file handle open')
+    end
+  end
 end
