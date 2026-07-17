@@ -46,6 +46,8 @@ class Xcop::Document
 
   XSI_NS = 'http://www.w3.org/2001/XMLSchema-instance'.freeze
 
+  PREFIX_LISTS = %w[exclude-result-prefixes extension-element-prefixes].freeze
+
   private
 
   # The canonical, well-formatted version of the document.
@@ -110,7 +112,13 @@ class Xcop::Document
   # prefix only inside +select+, +test+, +match+, +as+, +use+ and
   # similar attributes (e.g. +as="xs:integer"+ or +select="eo:foo()"+),
   # so stripping such a "declared but not QName-used" prefix would break
-  # the stylesheet. See #161.
+  # the stylesheet. See #161. A prefix is used, too, when it is named in an
+  # +exclude-result-prefixes+ or +extension-element-prefixes+ attribute;
+  # these list bare prefixes with no colon, so the +prefix:+ scan never
+  # catches them, yet XSLT requires every prefix named there to resolve to
+  # a declared namespace (dropping the declaration is the static error
+  # XTSE0808). The token +#default+ refers to the default namespace. See
+  # #165.
   def unused(xml)
     used = Set.new
     declared = Set.new
@@ -120,6 +128,8 @@ class Xcop::Document
       node.attribute_nodes.each do |attr|
         used << attr.namespace.prefix if attr.namespace
         attr.value.scan(/([A-Za-z_][\w.-]*):/) { |m| used << m.first }
+        next unless PREFIX_LISTS.include?(attr.name)
+        attr.value.split.each { |token| used << (token == '#default' ? nil : token) }
       end
       node.namespace_definitions.each { |ns| declared << ns.prefix }
     end
