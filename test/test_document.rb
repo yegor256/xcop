@@ -145,6 +145,42 @@ class TestXcop < Minitest::Test
     end
   end
 
+  def test_fix_keeps_exclude_result_prefixes_namespace
+    Dir.mktmpdir('test_ns_used_erp') do |dir|
+      f = File.join(dir, 'ns.xml')
+      File.write(f, <<-XML)
+<?xml version="1.0"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs" version="2.0">
+  <xsl:template match="/"/>
+</xsl:stylesheet>
+      XML
+      Xcop::Document.new(f).fix
+      assert_includes(
+        File.read(f),
+        'xmlns:xs=',
+        "Expected xmlns:xs named in exclude-result-prefixes to be preserved, got '#{File.read(f)}'"
+      )
+    end
+  end
+
+  def test_fix_keeps_extension_prefixes_namespace
+    Dir.mktmpdir('test_ns_used_eep') do |dir|
+      f = File.join(dir, 'ns.xml')
+      File.write(f, <<-XML)
+<?xml version="1.0"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:my="urn:my" extension-element-prefixes="my" version="2.0">
+  <xsl:template match="/"/>
+</xsl:stylesheet>
+      XML
+      Xcop::Document.new(f).fix
+      assert_includes(
+        File.read(f),
+        'xmlns:my=',
+        "Expected xmlns:my named in extension-element-prefixes to be preserved, got '#{File.read(f)}'"
+      )
+    end
+  end
+
   def test_diff_flags_unused_namespace
     Dir.mktmpdir('test_ns_diff') do |dir|
       f = File.join(dir, 'ns.xml')
