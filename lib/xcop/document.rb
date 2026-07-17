@@ -103,6 +103,14 @@ class Xcop::Document
   # Returns the set of namespace prefixes that are declared in +xml+
   # but never referenced by any element or attribute. A +nil+ entry in
   # the set represents the default namespace.
+  #
+  # A prefix counts as "used" not only when it appears as an element or
+  # attribute QName, but also when it is referenced from an attribute
+  # value as a +prefix:+ token. XSLT and XPath routinely mention a
+  # prefix only inside +select+, +test+, +match+, +as+, +use+ and
+  # similar attributes (e.g. +as="xs:integer"+ or +select="eo:foo()"+),
+  # so stripping such a "declared but not QName-used" prefix would break
+  # the stylesheet. See #161.
   def unused(xml)
     used = Set.new
     declared = Set.new
@@ -111,6 +119,7 @@ class Xcop::Document
       used << node.namespace.prefix if node.namespace
       node.attribute_nodes.each do |attr|
         used << attr.namespace.prefix if attr.namespace
+        attr.value.scan(/([A-Za-z_][\w.-]*):/) { |m| used << m.first }
       end
       node.namespace_definitions.each { |ns| declared << ns.prefix }
     end
