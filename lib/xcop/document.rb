@@ -51,7 +51,7 @@ class Xcop::Document
   # The canonical, well-formatted version of the document.
   def ideal
     xml = Nokogiri::XML(File.read(@path), &:noblanks)
-    recomment(xml)
+    reshape(xml)
     text = xml.to_xml(indent: 2)
     unused(xml).each do |prefix|
       text =
@@ -70,7 +70,7 @@ class Xcop::Document
   # single line as +<!-- text -->+. A comment whose text spans several
   # lines is re-emitted with +<!--+ and +-->+ each alone on their own
   # line and every body line trimmed to the comment's own indent.
-  def recomment(xml)
+  def reshape(xml)
     xml.traverse do |node|
       next unless node.comment?
       node.native_content = canonical(node)
