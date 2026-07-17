@@ -168,4 +168,16 @@ class TestXcop < Minitest::Test
       assert_empty(Xcop::Document.new(f).validate, 'Expected no XSD errors when no schema declared')
     end
   end
+
+  def test_xsd_validation_reports_missing_schema
+    Dir.mktmpdir('test_xsd_missing') do |dir|
+      xml = File.join(dir, 'orphan.xml')
+      File.write(xml, <<-XML)
+<?xml version="1.0"?>
+<person xmlns:xsi="#{XSI}" xsi:noNamespaceSchemaLocation="absent.xsd">
+</person>
+      XML
+      refute_empty(Xcop::Document.new(xml).validate, 'Missing XSD schema cannot be silently ignored')
+    end
+  end
 end

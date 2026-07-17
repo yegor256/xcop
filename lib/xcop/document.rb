@@ -34,12 +34,13 @@ class Xcop::Document
   end
 
   # Validates the document against its declared XSD schema, if any.
-  # Returns an array of error message strings (empty when valid or no schema declared).
+  # Returns an array of error message strings (empty when valid or no
+  # schema declared); a declared but missing schema is itself an error.
   def validate
     xml = Nokogiri::XML(File.open(@path))
     xsd = schema(xml)
     return [] unless xsd
-    return [] unless File.exist?(xsd)
+    return ["schema file is absent at #{xsd}"] unless File.exist?(xsd)
     Nokogiri::XML::Schema(File.read(xsd)).validate(xml).map(&:message)
   end
 
