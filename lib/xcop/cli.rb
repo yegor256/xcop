@@ -41,11 +41,13 @@ class Xcop::CLI
     end
   end
 
-  # Fix them all.
+  # Fix them all. The block, when given, receives the file path and a
+  # status symbol that is +:fixed+ when the file was rewritten and
+  # +:untouched+ when the file was already canonical.
   def fix
     @files.each do |f|
-      Xcop::Document.new(f).fix
-      yield(f) if block_given?
+      status = Xcop::Document.new(f).fix
+      yield(f, status) if block_given?
     end
   end
 end

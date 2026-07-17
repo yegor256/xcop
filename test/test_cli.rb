@@ -156,4 +156,17 @@ class CLITest < Minitest::Test
       refute_equal(second, File.read(two), "Expected to fix invalid file - '#{two}'")
     end
   end
+
+  def test_fix_yields_status_for_each_file
+    Dir.mktmpdir('test_fix_yield_status') do |dir|
+      good = File.join(dir, 'good.xml')
+      bad = File.join(dir, 'bad.xml')
+      File.write(good, "<?xml version=\"1.0\"?>\n<root>\n  <item>1</item>\n</root>\n")
+      File.write(bad, '<root><item>2</item></root>')
+      seen = {}
+      Xcop::CLI.new([good, bad]).fix { |file, status| seen[file] = status }
+      assert_equal(:untouched, seen[good], "Expected '#{good}' to be reported untouched")
+      assert_equal(:fixed, seen[bad], "Expected '#{bad}' to be reported fixed")
+    end
+  end
 end

@@ -23,9 +23,14 @@ class Xcop::Document
     differ(ideal, File.read(@path), nocolor: nocolor)
   end
 
-  # Fixes the document.
+  # Fixes the document, returning +:fixed+ when the file content
+  # changed on disk and +:untouched+ when the file was already
+  # canonical.
   def fix
-    File.write(@path, ideal)
+    canonical = ideal
+    return :untouched if canonical == File.read(@path)
+    File.write(@path, canonical)
+    :fixed
   end
 
   # Validates the document against its declared XSD schema, if any.
