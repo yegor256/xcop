@@ -55,6 +55,14 @@ xcop .
 xcop --fix src/resources
 ```
 
+When you run `xcop` without any files, directories, or `--include`
+globs, it checks the current directory, exactly as if you called
+`xcop .`:
+
+```bash
+xcop
+```
+
 ## Defaults
 
 You can put command line options into a `.xcop` file in the directory
