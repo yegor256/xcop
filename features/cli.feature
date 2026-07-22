@@ -44,6 +44,24 @@ Feature: Command Line Processing
     Then I run bin/xcop with "broken.xml"
     Then Exit code is zero
 
+  Scenario: Validating all files in the current directory by default
+    Given I have a "auto.xml" file with content:
+    """
+    <?xml version="1.0"?>
+    <hello>Hello, world!</hello>
+
+    """
+    And I have a "nested/deep.xsl" file with content:
+    """
+    <?xml version="1.0"?>
+    <hello>Hello, world!</hello>
+
+    """
+    When I run bin/xcop with ""
+    Then Stdout contains "auto.xml looks good"
+    And Stdout contains "deep.xsl looks good"
+    And Exit code is zero
+
   Scenario: Validating a directory of XML files recursively
     Given I have a "pkg/top.xml" file with content:
     """
