@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<config debug="true" level="5">
+  <item name="alpha" value="1"/>
+  <item name="beta" value="2"/>
+</config>

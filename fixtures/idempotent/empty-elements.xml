@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<gallery>
+  <image src="a.png"/>
+  <image src="b.png"/>
+  <break/>
+</gallery>

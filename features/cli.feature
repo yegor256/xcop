@@ -44,6 +44,16 @@ Feature: Command Line Processing
     Then I run bin/xcop with "broken.xml"
     Then Exit code is zero
 
+  Scenario: Refusing to fix a non-well-formed XML file
+    Given I have a "garbage.xml" file with content:
+    """
+    this is not XML
+    """
+    When I run bin/xcop with "--fix garbage.xml"
+    Then Stdout contains "is not a well-formed XML"
+    And Exit code is zero
+    And The file "garbage.xml" contains "this is not XML"
+
   Scenario: Validating all files in the current directory by default
     Given I have a "auto.xml" file with content:
     """
