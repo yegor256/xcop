@@ -24,9 +24,11 @@ class Xcop::Document
   end
 
   # Fixes the document, returning +:fixed+ when the file content
-  # changed on disk and +:untouched+ when the file was already
-  # canonical.
+  # changed on disk, +:untouched+ when the file was already canonical,
+  # and +:malformed+ when the file is not well-formed XML and thus
+  # left on disk exactly as it was.
   def fix
+    return :malformed unless wellformed?
     canonical = ideal
     return :untouched if canonical == File.read(@path)
     File.write(@path, canonical)
@@ -49,6 +51,14 @@ class Xcop::Document
   PREFIX_LISTS = %w[exclude-result-prefixes extension-element-prefixes].freeze
 
   private
+
+  # Is the document well-formed XML? Nokogiri parses in recover mode
+  # and never raises, so a broken file yields a rootless document that
+  # +to_xml+ renders as an empty declaration; a fatal parse error is
+  # the signal that the file cannot be safely reformatted. See #173.
+  def wellformed?
+    Nokogiri::XML(File.read(@path)).errors.none?(&:fatal?)
+  end
 
   # The canonical, well-formatted version of the document.
   def ideal

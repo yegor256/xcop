@@ -48,6 +48,31 @@ class TestXcop < Minitest::Test
     end
   end
 
+  def test_fix_reports_malformed_when_not_wellformed
+    Dir.mktmpdir('test_fix_malformed') do |dir|
+      f = File.join(dir, 'broken.xml')
+      File.write(f, "this is not XML\n")
+      assert_equal(
+        :malformed,
+        Xcop::Document.new(f).fix,
+        'Expected fix to report :malformed on a file that is not well-formed XML'
+      )
+    end
+  end
+
+  def test_fix_leaves_malformed_file_untouched
+    Dir.mktmpdir('test_fix_keep_malformed') do |dir|
+      f = File.join(dir, 'broken.xml')
+      File.write(f, "this is not XML\n")
+      Xcop::Document.new(f).fix
+      assert_equal(
+        "this is not XML\n",
+        File.read(f),
+        'Expected a non-well-formed file to be left untouched by fix'
+      )
+    end
+  end
+
   def test_fix_reports_untouched_when_file_canonical
     Dir.mktmpdir('test_fix_untouched') do |dir|
       f = File.join(dir, 'good.xml')

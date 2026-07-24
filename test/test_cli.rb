@@ -157,6 +157,25 @@ class CLITest < Minitest::Test
     end
   end
 
+  def test_fix_yields_malformed_status_for_broken_file
+    Dir.mktmpdir('test_fix_malformed_cli') do |dir|
+      f = File.join(dir, 'broken.xml')
+      File.write(f, "this is not XML\n")
+      status = nil
+      Xcop::CLI.new([f]).fix { |_file, sym| status = sym }
+      assert_equal(:malformed, status, "Expected '#{f}' to be reported malformed, got '#{status}'")
+    end
+  end
+
+  def test_fix_keeps_broken_file_intact
+    Dir.mktmpdir('test_fix_intact_cli') do |dir|
+      f = File.join(dir, 'broken.xml')
+      File.write(f, "this is not XML\n")
+      Xcop::CLI.new([f]).fix
+      assert_equal("this is not XML\n", File.read(f), "Expected broken file '#{f}' to remain intact")
+    end
+  end
+
   def test_fix_yields_status_for_each_file
     Dir.mktmpdir('test_fix_yield_status') do |dir|
       good = File.join(dir, 'good.xml')

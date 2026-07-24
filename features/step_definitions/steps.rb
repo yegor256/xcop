@@ -38,6 +38,11 @@ Then(/^Stdout contains "([^"]*)"$/) do |txt|
   raise(StandardError, "STDOUT doesn't contain '#{txt}':\n#{@stdout}") unless @stdout.include?(txt)
 end
 
+Then(/^The file "([^"]*)" contains "([^"]*)"$/) do |file, txt|
+  body = File.read(file)
+  raise(StandardError, "File '#{file}' doesn't contain '#{txt}':\n#{body}") unless body.include?(txt)
+end
+
 Then(/^Stdout is empty$/) do
   raise(StandardError, "STDOUT is not empty:\n#{@stdout}") unless @stdout == ''
 end

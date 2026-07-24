@@ -68,7 +68,11 @@ end
 
 if opts.fix?
   Xcop::CLI.new(files).fix do |f, status|
-    puts "#{f} #{status}" unless opts.quiet?
+    if status == :malformed
+      puts "#{f} is not a well-formed XML, cannot fix it"
+    elsif !opts.quiet?
+      puts "#{f} #{status}"
+    end
   end
 else
   begin
