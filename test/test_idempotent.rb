@@ -15,13 +15,13 @@ class IdempotentTest < Minitest::Test
 
   def test_fixtures_directory_is_not_empty
     refute_empty(
-      Dir.glob(File.join(FIXTURES, '*.xml')),
+      Dir.glob(File.join(FIXTURES, '*')).select { |f| File.file?(f) },
       'Idempotent fixtures cannot be absent from the fixtures directory'
     )
   end
 
-  Dir.glob(File.join(FIXTURES, '*.xml')).sort.each do |fixture|
-    define_method("test_#{File.basename(fixture, '.xml').tr('-', '_')}_survives_fix_unchanged") do
+  Dir.glob(File.join(FIXTURES, '*')).select { |f| File.file?(f) }.sort!.each do |fixture|
+    define_method("test_#{File.basename(fixture).gsub(/\W/, '_')}_survives_fix_unchanged") do
       Dir.mktmpdir('idempotent') do |dir|
         copy = File.join(dir, File.basename(fixture))
         FileUtils.cp(fixture, copy)
