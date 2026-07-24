@@ -1,0 +1,2 @@
+<?xml version="1.0"?>
+<script><![CDATA[if (a < b) { return; }]]></script>

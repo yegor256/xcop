@@ -8,6 +8,7 @@ path = [
     ".gitattributes",
     ".gitignore",
     ".pdd",
+    "fixtures/**",
     "**.json",
     "**.md",
     "**.png",
