@@ -17,3 +17,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: yegor256/copyrights-action@0.0.12
+        with:
+          ignore: >-
+            fixtures/**
+            target/**
+            node_modules/**
+            .git/**
