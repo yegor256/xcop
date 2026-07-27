@@ -24,9 +24,16 @@ class Xcop::CLI
     EXTENSIONS.flat_map { |ext| Dir.glob(File.join(dir, '**', "*.#{ext}")) }.sort
   end
 
+  # Check them all. The block, when given, receives the file path and a
+  # status symbol that is +:good+ when the file is clean and
+  # +:malformed+ when the file is not XML at all and was skipped.
   def run
     @files.each do |f|
       doc = Xcop::Document.new(f)
+      unless doc.wellformed?
+        yield(f, :malformed) if block_given?
+        next
+      end
       diff = doc.diff(nocolor: @nocolor)
       unless diff.empty?
         puts(diff)
@@ -37,7 +44,7 @@ class Xcop::CLI
         puts(errors.join("\n"))
         raise(StandardError, "XSD validation failed in #{f}")
       end
-      yield(f) if block_given?
+      yield(f, :good) if block_given?
     end
   end
 

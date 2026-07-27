@@ -18,6 +18,15 @@ class Xcop::Document
     @path = path
   end
 
+  # Is the document well-formed XML? Nokogiri parses in recover mode
+  # and never raises, so a broken file yields a rootless document that
+  # +to_xml+ renders as an empty declaration; a fatal parse error is
+  # the signal that the file is not XML and thus can neither be
+  # reformatted nor sensibly compared to its ideal. See #173 and #175.
+  def wellformed?
+    Nokogiri::XML(File.read(@path)).errors.none?(&:fatal?)
+  end
+
   # Return the difference, if any (empty string if everything is clean).
   def diff(nocolor: false)
     differ(ideal, File.read(@path), nocolor: nocolor)
@@ -51,14 +60,6 @@ class Xcop::Document
   PREFIX_LISTS = %w[exclude-result-prefixes extension-element-prefixes].freeze
 
   private
-
-  # Is the document well-formed XML? Nokogiri parses in recover mode
-  # and never raises, so a broken file yields a rootless document that
-  # +to_xml+ renders as an empty declaration; a fatal parse error is
-  # the signal that the file cannot be safely reformatted. See #173.
-  def wellformed?
-    Nokogiri::XML(File.read(@path)).errors.none?(&:fatal?)
-  end
 
   # The canonical, well-formatted version of the document.
   def ideal

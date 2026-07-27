@@ -48,6 +48,28 @@ class TestXcop < Minitest::Test
     end
   end
 
+  def test_reports_plain_text_as_not_wellformed
+    Dir.mktmpdir('test_not_wellformed') do |dir|
+      f = File.join(dir, 'notes.txt')
+      File.write(f, "not xml at all\n")
+      refute_predicate(
+        Xcop::Document.new(f), :wellformed?,
+        'Expected a plain text file to be reported as not well-formed XML'
+      )
+    end
+  end
+
+  def test_reports_xml_as_wellformed
+    Dir.mktmpdir('test_wellformed') do |dir|
+      f = File.join(dir, 'a.xml')
+      File.write(f, '<hello>Dude!</hello>')
+      assert_predicate(
+        Xcop::Document.new(f), :wellformed?,
+        'Expected a sloppy but parseable XML file to be reported as well-formed'
+      )
+    end
+  end
+
   def test_fix_reports_malformed_when_not_wellformed
     Dir.mktmpdir('test_fix_malformed') do |dir|
       f = File.join(dir, 'broken.xml')

@@ -93,6 +93,35 @@ class CLITest < Minitest::Test
     end
   end
 
+  def test_run_skips_plain_text_file
+    Dir.mktmpdir('test_run_text') do |dir|
+      f = File.join(dir, 'notes.txt')
+      File.write(f, "not xml at all\n")
+      status = nil
+      Xcop::CLI.new([f]).run { |_file, sym| status = sym }
+      assert_equal(:malformed, status, "Expected '#{f}' to be reported malformed, got '#{status}'")
+    end
+  end
+
+  def test_run_doesnt_fail_on_plain_text_file
+    Dir.mktmpdir('test_run_text_quiet') do |dir|
+      f = File.join(dir, 'notes.txt')
+      File.write(f, "not xml at all\n")
+      cli = Xcop::CLI.new([f])
+      assert_silent { cli.run }
+    end
+  end
+
+  def test_run_reports_good_status_for_canonical_file
+    Dir.mktmpdir('test_run_good') do |dir|
+      f = File.join(dir, 'good.xml')
+      File.write(f, "<?xml version=\"1.0\"?>\n<root>\n  <item>1</item>\n</root>\n")
+      status = nil
+      Xcop::CLI.new([f]).run { |_file, sym| status = sym }
+      assert_equal(:good, status, "Expected '#{f}' to be reported good, got '#{status}'")
+    end
+  end
+
   def test_fix_valid_file_no_changes
     Dir.mktmpdir('test_no_fix') do |dir|
       f = File.join(dir, 'valid.xml')

@@ -54,6 +54,15 @@ Feature: Command Line Processing
     And Exit code is zero
     And The file "garbage.xml" contains "this is not XML"
 
+  Scenario: Skipping a plain text file while checking
+    Given I have a "foo.txt" file with content:
+    """
+    not xml at all
+    """
+    When I run bin/xcop with "foo.txt"
+    Then Stdout contains "is not a well-formed XML, skipping it"
+    And Exit code is zero
+
   Scenario: Validating all files in the current directory by default
     Given I have a "auto.xml" file with content:
     """
