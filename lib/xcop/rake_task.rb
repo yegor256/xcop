@@ -35,8 +35,8 @@ class Xcop::RakeTask < Rake::TaskLib
     good = Dir.glob(@includes).reject { |f| bad.include?(f) }
     puts("Inspecting #{pluralize(good.length, 'file')}...") unless @quiet
     begin
-      Xcop::CLI.new(good).run do
-        print(Rainbow('.').green) unless @quiet
+      Xcop::CLI.new(good).run do |_f, status|
+        print(status == :malformed ? Rainbow('?').yellow : Rainbow('.').green) unless @quiet
       end
     rescue StandardError => e
       puts(e.message)

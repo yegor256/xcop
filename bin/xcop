@@ -76,8 +76,12 @@ if opts.fix?
   end
 else
   begin
-    Xcop::CLI.new(files, nocolor: opts.nocolor?).run do |f|
-      puts "#{f} looks good" unless opts.quiet?
+    Xcop::CLI.new(files, nocolor: opts.nocolor?).run do |f, status|
+      if status == :malformed
+        puts "#{f} is not a well-formed XML, skipping it"
+      elsif !opts.quiet?
+        puts "#{f} looks good"
+      end
     end
   rescue StandardError => e
     puts e.message
