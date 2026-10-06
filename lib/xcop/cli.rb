@@ -21,7 +21,7 @@ class Xcop::CLI
 
   # Recursively collect XML-like files inside a directory.
   def self.expand(dir)
-    EXTENSIONS.flat_map { |ext| Dir.glob(File.join(dir, '**', "*.#{ext}")) }.sort
+    Dir.glob(File.join(dir, '**', "*.{#{EXTENSIONS.join(',')}}")).sort
   end
 
   # Check them all. The block, when given, receives the file path and a
