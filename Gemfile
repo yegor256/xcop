@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 source 'https://rubygems.org'
+ruby '>= 3.3'
 gemspec
 
 gem 'cucumber', '~>12.0', require: false
