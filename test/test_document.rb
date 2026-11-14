@@ -228,6 +228,58 @@ class TestXcop < Minitest::Test
     end
   end
 
+  def test_fix_preserves_xmlns_like_text_in_cdata
+    Dir.mktmpdir('test_ns_cdata') do |dir|
+      f = File.join(dir, 'ns.xml')
+      File.write(
+        f,
+        "<?xml version=\"1.0\"?>\n<root xmlns:spare=\"urn:spare\"><![CDATA[keep xmlns:spare=\"literal\"]]></root>\n"
+      )
+      Xcop::Document.new(f).fix
+      assert_includes(
+        File.read(f),
+        '<![CDATA[keep xmlns:spare="literal"]]>',
+        "Expected the CDATA content to survive fix verbatim, got '#{File.read(f)}'"
+      )
+      refute_includes(
+        File.read(f),
+        'xmlns:spare="urn:spare"',
+        "Expected the unused xmlns:spare declaration to be removed, got '#{File.read(f)}'"
+      )
+    end
+  end
+
+  def test_fix_preserves_xmlns_like_element_text
+    Dir.mktmpdir('test_ns_text') do |dir|
+      f = File.join(dir, 'ns.xml')
+      File.write(f, "<?xml version=\"1.0\"?>\n<root xmlns:spare=\"urn:spare\"> xmlns:spare=\"literal\" </root>\n")
+      Xcop::Document.new(f).fix
+      assert_includes(
+        File.read(f),
+        ' xmlns:spare="literal" ',
+        "Expected the element text to survive fix verbatim, got '#{File.read(f)}'"
+      )
+    end
+  end
+
+  def test_fix_preserves_xmlns_like_comment_text
+    Dir.mktmpdir('test_ns_comment') do |dir|
+      f = File.join(dir, 'ns.xml')
+      File.write(f, <<-XML)
+<?xml version="1.0"?>
+<root xmlns:spare="urn:spare">
+  <!-- xmlns:spare="literal" -->
+</root>
+      XML
+      Xcop::Document.new(f).fix
+      assert_includes(
+        File.read(f),
+        '<!-- xmlns:spare="literal" -->',
+        "Expected the comment to survive fix verbatim, got '#{File.read(f)}'"
+      )
+    end
+  end
+
   def test_diff_flags_unused_namespace
     Dir.mktmpdir('test_ns_diff') do |dir|
       f = File.join(dir, 'ns.xml')
