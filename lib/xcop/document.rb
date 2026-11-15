@@ -4,6 +4,7 @@
 require 'differ'
 require 'nokogiri'
 require 'rainbow'
+require 'securerandom'
 require 'set'
 require_relative 'version'
 
@@ -79,7 +80,8 @@ class Xcop::Document
   # substitutions can only ever hit real declaration nodes. See #210.
   def serialize(xml, prefixes)
     slots = {}
-    xml.traverse { |node| hide(node, slots) }
+    token = unclaimed(xml)
+    xml.traverse { |node| hide(node, token, slots) }
     text = xml.to_xml(indent: 2)
     prefixes.each do |prefix|
       text =
@@ -94,15 +96,34 @@ class Xcop::Document
     out.to_xml(indent: 2)
   end
 
+  # The random core of the placeholders that hide content: pure ASCII,
+  # because +to_xml+ serializes the document in its own declared
+  # encoding. A placeholder outside the document's repertoire, such as
+  # a private-use character in an ISO-8859-1 document, comes back as a
+  # numeric character reference (&#57344;) — and CDATA sections and
+  # comments are never entity-decoded on re-parse, so the original
+  # content could not be restored and would be silently lost. ASCII
+  # round-trips through every encoding libxml2 can emit. The token is
+  # random per document and regenerated if any real text, CDATA,
+  # comment or attribute value already contains it, so it cannot
+  # collide with application data. See #210.
+  def unclaimed(xml)
+    loop do
+      token = "XCOP-HIDE-#{SecureRandom.hex(16)}"
+      taken = xml.xpath('//text() | //comment() | //@*')
+      return token unless taken.any? { |n| n.content.include?(token) }
+    end
+  end
+
   # Hides the content of a single text, CDATA or comment +node+ behind
-  # a unique placeholder, remembering the original in +slots+. Blank
-  # text nodes are left alone: they cannot carry the +xmlns:+ pattern,
-  # and they must keep flowing through the +:noblanks+ re-parse exactly
-  # as they did before.
-  def hide(node, slots)
+  # a unique placeholder built from +token+, remembering the original
+  # in +slots+. Blank text nodes are left alone: they cannot carry the
+  # +xmlns:+ pattern, and they must keep flowing through the +:noblanks+
+  # re-parse exactly as they did before.
+  def hide(node, token, slots)
     return unless node.text? || node.cdata? || node.comment?
     return if node.content.match?(/\A\s*\z/)
-    marker = "\uE000#{slots.size}\uE001"
+    marker = "#{token}-#{slots.size}-XCOP"
     slots[marker] = node.content
     if node.comment?
       node.native_content = marker

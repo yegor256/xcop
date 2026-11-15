@@ -280,6 +280,89 @@ class TestXcop < Minitest::Test
     end
   end
 
+  def test_fix_preserves_xmlns_like_cdata_in_latin
+    Dir.mktmpdir('test_ns_latin') do |dir|
+      f = File.join(dir, 'ns.xml')
+      File.binwrite(f, <<-XML)
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<root xmlns:spare="urn:spare">
+  <![CDATA[keep xmlns:spare="literal"]]>
+  <!-- keep xmlns:spare="literal" -->
+</root>
+      XML
+      Xcop::Document.new(f).fix
+      content = File.binread(f)
+      assert_includes(
+        content,
+        '<![CDATA[keep xmlns:spare="literal"]]>',
+        "Expected the CDATA content to survive fix in a Latin-1 document, got '#{content}'"
+      )
+      assert_includes(
+        content,
+        '<!-- keep xmlns:spare="literal" -->',
+        "Expected the comment to survive fix in a Latin-1 document, got '#{content}'"
+      )
+      refute_includes(
+        content,
+        'xmlns:spare="urn:spare"',
+        "Expected the unused xmlns:spare declaration to be removed, got '#{content}'"
+      )
+      refute_includes(
+        content,
+        '&#',
+        "Expected no numeric character references in a Latin-1 document, got '#{content}'"
+      )
+      refute_includes(
+        content,
+        'XCOP-HIDE',
+        "Expected no placeholder to leak into a Latin-1 document, got '#{content}'"
+      )
+    end
+  end
+
+  def test_fix_preserves_non_ascii_in_latin
+    Dir.mktmpdir('test_ns_latin_bytes') do |dir|
+      f = File.join(dir, 'ns.xml')
+      File.binwrite(f, <<-XML)
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<root xmlns:spare="urn:spare">
+  <![CDATA[r\xE9sum\xE9 xmlns:spare="literal"]]>
+  <!-- r\xE9sum\xE9 xmlns:spare="literal" -->
+</root>
+      XML
+      Xcop::Document.new(f).fix
+      content = File.binread(f)
+      assert_includes(
+        content,
+        "<![CDATA[r\xE9sum\xE9 xmlns:spare=\"literal\"]]>".b,
+        "Expected the CDATA bytes to survive fix byte-exact, got #{content.inspect}"
+      )
+      assert_includes(
+        content,
+        "<!-- r\xE9sum\xE9 xmlns:spare=\"literal\" -->".b,
+        "Expected the comment bytes to survive fix byte-exact, got #{content.inspect}"
+      )
+      refute_includes(
+        content,
+        '&#',
+        "Expected no numeric character references in a Latin-1 document, got #{content.inspect}"
+      )
+    end
+  end
+
+  def test_fix_idempotent_in_latin
+    Dir.mktmpdir('test_ns_latin_idem') do |dir|
+      f = File.join(dir, 'ns.xml')
+      File.binwrite(f, <<-XML)
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<root xmlns:spare="urn:spare"><![CDATA[keep]]><!-- keep --></root>
+      XML
+      assert_equal(:fixed, Xcop::Document.new(f).fix)
+      assert_equal(:untouched, Xcop::Document.new(f).fix, 'Expected the second fix to leave the file untouched')
+      assert_equal('', Xcop::Document.new(f).diff, 'Expected an empty diff after fix of a Latin-1 document')
+    end
+  end
+
   def test_diff_flags_unused_namespace
     Dir.mktmpdir('test_ns_diff') do |dir|
       f = File.join(dir, 'ns.xml')
