@@ -59,6 +59,7 @@ end
 targets = opts.arguments
 targets = ['.'] if targets.empty? && Array(opts[:include]).empty?
 files += targets.map { |f| File.expand_path(f) }
+files = files.flat_map { |f| File.directory?(f) ? Xcop::CLI.expand(f) : [f] }.to_set
 
 if opts[:exclude]
   opts[:exclude].each do |glob|

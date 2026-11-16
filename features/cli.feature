@@ -98,3 +98,19 @@ Feature: Command Line Processing
     Then Stdout contains "top.xml looks good"
     And Stdout contains "deep.xsl looks good"
     And Exit code is zero
+
+  Scenario: Excluding files found inside a directory argument
+    Given I have a "keep/top.xml" file with content:
+    """
+    <?xml version="1.0"?>
+    <hello>Hello, world!</hello>
+
+    """
+    And I have a "skip/bad.xsl" file with content:
+    """
+    <a><b>something</b>
+    </a>
+    """
+    When I run bin/xcop with ". --exclude=skip/*.xsl"
+    Then Stdout contains "top.xml looks good"
+    And Exit code is zero
