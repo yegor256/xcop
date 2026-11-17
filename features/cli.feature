@@ -114,3 +114,29 @@ Feature: Command Line Processing
     When I run bin/xcop with ". --exclude=skip/*.xsl"
     Then Stdout contains "top.xml looks good"
     And Exit code is zero
+
+  Scenario: Excluding a directory argument itself
+    Given I have a "pkg/bad.xml" file with content:
+    """
+    <a><b>something</b>
+    </a>
+    """
+    When I run bin/xcop with "pkg --exclude=pkg"
+    Then Stdout is empty
+    And Exit code is zero
+
+  Scenario: Excluding a directory argument while checking other files
+    Given I have a "pkg/bad.xml" file with content:
+    """
+    <a><b>something</b>
+    </a>
+    """
+    And I have a "keep/top.xml" file with content:
+    """
+    <?xml version="1.0"?>
+    <hello>Hello, world!</hello>
+
+    """
+    When I run bin/xcop with ". --exclude=pkg"
+    Then Stdout contains "top.xml looks good"
+    And Exit code is zero
