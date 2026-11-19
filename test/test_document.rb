@@ -363,6 +363,47 @@ class TestXcop < Minitest::Test
     end
   end
 
+  def test_fix_preserves_xmlns_like_cdata_in_cyrillic
+    Dir.mktmpdir('test_ns_koi8') do |dir|
+      f = File.join(dir, 'ns.xml')
+      doc = <<-XML
+<?xml version="1.0" encoding="KOI8-R"?>
+<root xmlns:spare="urn:spare">
+  <![CDATA[резюме xmlns:spare="literal"]]>
+  <!-- резюме xmlns:spare="literal" -->
+</root>
+      XML
+      File.binwrite(f, doc.encode('KOI8-R'))
+      Xcop::Document.new(f).fix
+      content = File.binread(f)
+      assert_includes(
+        content,
+        '<![CDATA[резюме xmlns:spare="literal"]]>'.encode('KOI8-R').b,
+        "Expected the CDATA content to survive fix byte-exact in a KOI8-R document, got #{content.inspect}"
+      )
+      assert_includes(
+        content,
+        '<!-- резюме xmlns:spare="literal" -->'.encode('KOI8-R').b,
+        "Expected the comment content to survive fix byte-exact in a KOI8-R document, got #{content.inspect}"
+      )
+      refute_includes(
+        content,
+        'xmlns:spare="urn:spare"'.encode('KOI8-R').b,
+        "Expected the unused xmlns:spare declaration to be removed in a KOI8-R document, got '#{content}'"
+      )
+      refute_includes(
+        content,
+        '&#',
+        "Expected no numeric character references in a KOI8-R document, got #{content.inspect}"
+      )
+      refute_includes(
+        content,
+        'XCOP-HIDE',
+        "Expected no placeholder to leak into a KOI8-R document, got #{content.inspect}"
+      )
+    end
+  end
+
   def test_diff_flags_unused_namespace
     Dir.mktmpdir('test_ns_diff') do |dir|
       f = File.join(dir, 'ns.xml')
