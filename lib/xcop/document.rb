@@ -4,6 +4,7 @@
 require 'differ'
 require 'nokogiri'
 require 'rainbow'
+require 'securerandom'
 require 'set'
 require_relative 'version'
 
@@ -65,8 +66,24 @@ class Xcop::Document
   def ideal
     xml = Nokogiri::XML(File.read(@path), &:noblanks)
     reshape(xml)
+    serialize(xml, unused(xml))
+  end
+
+  # Serializes +xml+ and removes from the markup every declaration of
+  # the given unused namespace prefixes (+nil+ meaning the default
+  # namespace). The substitutions run over the fully serialized XML
+  # string, where the same +xmlns:prefix="..."+ pattern a declaration
+  # produces may also occur inside CDATA sections, comments and
+  # ordinary element text. To keep that application data verbatim, the
+  # content of every text, CDATA and comment node is first hidden
+  # behind a unique placeholder and restored after the re-parse, so the
+  # substitutions can only ever hit real declaration nodes. See #210.
+  def serialize(xml, prefixes)
+    slots = {}
+    token = unclaimed(xml)
+    xml.traverse { |node| hide(node, token, slots) }
     text = xml.to_xml(indent: 2)
-    unused(xml).each do |prefix|
+    prefixes.each do |prefix|
       text =
         if prefix.nil?
           text.gsub(/\s+xmlns="[^"]*"/, '')
@@ -74,7 +91,58 @@ class Xcop::Document
           text.gsub(/\s+xmlns:#{Regexp.escape(prefix)}="[^"]*"/, '')
         end
     end
-    Nokogiri::XML(text, &:noblanks).to_xml(indent: 2)
+    out = Nokogiri::XML(text, &:noblanks)
+    out.traverse { |node| reveal(node, slots) }
+    out.to_xml(indent: 2)
+  end
+
+  # The random core of the placeholders that hide content: pure ASCII,
+  # because +to_xml+ serializes the document in its own declared
+  # encoding. A placeholder outside the document's repertoire, such as
+  # a private-use character in an ISO-8859-1 document, comes back as a
+  # numeric character reference (&#57344;) — and CDATA sections and
+  # comments are never entity-decoded on re-parse, so the original
+  # content could not be restored and would be silently lost. ASCII
+  # round-trips through every encoding libxml2 can emit. The token is
+  # random per document and regenerated if any real text, CDATA,
+  # comment or attribute value already contains it, so it cannot
+  # collide with application data. See #210.
+  def unclaimed(xml)
+    loop do
+      token = "XCOP-HIDE-#{SecureRandom.hex(16)}"
+      taken = xml.xpath('//text() | //comment() | //@*')
+      return token unless taken.any? { |n| n.content.include?(token) }
+    end
+  end
+
+  # Hides the content of a single text, CDATA or comment +node+ behind
+  # a unique placeholder built from +token+, remembering the original
+  # in +slots+. Blank text nodes are left alone: they cannot carry the
+  # +xmlns:+ pattern, and they must keep flowing through the +:noblanks+
+  # re-parse exactly as they did before.
+  def hide(node, token, slots)
+    return unless node.text? || node.cdata? || node.comment?
+    return if node.content.match?(/\A\s*\z/)
+    marker = "#{token}-#{slots.size}-XCOP"
+    slots[marker] = node.content
+    if node.comment?
+      node.native_content = marker
+    else
+      node.content = marker
+    end
+  end
+
+  # Restores the original content hidden in +slots+ back into the
+  # re-parsed +node+.
+  def reveal(node, slots)
+    return unless node.text? || node.cdata? || node.comment?
+    content = slots[node.content]
+    return if content.nil?
+    if node.comment?
+      node.native_content = content
+    else
+      node.content = content
+    end
   end
 
   # Rewrites every comment node into one of two canonical shapes so that
